@@ -16,10 +16,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.composeapp.R
+import com.example.composeapp.ui.theme.Dimens
 import com.example.composeapp.ui.theme.RecipesAppTheme
 import com.example.composeapp.ui.theme.recipesAppTypography
 
@@ -31,51 +33,52 @@ fun BottomNavigation(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = Dimens.paddingLarge)
             .padding(
-                top = 8.dp,
+                top = Dimens.paddingMedium,
                 bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             )
     ) {
         Button(
             onClick = onCategoriesClick,
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+            shape = RoundedCornerShape(Dimens.cornerRadiusMedium),
+            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary),
             modifier = Modifier
                 .weight(1f)
         ) {
             Text(
-                text = "КАТЕГОРИИ",
+                text = stringResource(R.string.categories).uppercase(),
                 style = recipesAppTypography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = Color.White
             )
         }
 
-        Spacer(modifier = Modifier.size(4.dp))
+        Spacer(modifier = Modifier.size(Dimens.paddingSmall))
 
         Button(
             onClick = onFavoriteClick,
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(Dimens.cornerRadiusMedium),
             colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
             modifier = Modifier
                 .weight(1f)
         ) {
             Text(
-                text = "ИЗБРАННОЕ",
+                text = stringResource(R.string.favorites).uppercase(),
                 style = recipesAppTypography.titleMedium,
-                color = MaterialTheme.colorScheme.onSecondary,
-                modifier = Modifier.padding(end = 10.dp)
+                color = Color.White,
+                modifier = Modifier.padding(end = Dimens.paddingBig)
             )
             Icon(
                 painter = painterResource(id = R.drawable.ic_heart_empty),
                 contentDescription = "",
-                tint = MaterialTheme.colorScheme.onSecondary,
+                tint = Color.White,
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(Dimens.iconSizeMedium)
             )
         }
     }
 }
+
 
 @Preview(
     name = "LightTheme",
@@ -94,7 +97,8 @@ fun BottomNavigationLightPreview() {
 @Preview(
     name = "DarkTheme",
     showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
+    locale = "en"
 )
 @Composable
 fun BottomNavigationDarkPreview() {

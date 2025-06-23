@@ -13,8 +13,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.composeapp.model.ScreenId
+import com.example.composeapp.ui.screens.CategoriesScreen
 import com.example.composeapp.ui.navigation.BottomNavigation
 import com.example.composeapp.ui.theme.RecipesAppTheme
 import com.example.composeapp.ui.theme.recipesAppTypography
@@ -48,26 +50,13 @@ fun RecipesApp() {
 }
 
 @Composable
-fun CategoriesScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Экран Категорий",
-            style = recipesAppTypography.displayLarge
-        )
-    }
-}
-
-@Composable
 fun FavoritesScreen() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Экран Избранного",
+            text = stringResource(R.string.screen_favorites),
             style = recipesAppTypography.displayLarge
         )
     }
