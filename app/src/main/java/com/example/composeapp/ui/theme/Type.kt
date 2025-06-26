@@ -4,6 +4,9 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.W400
+import androidx.compose.ui.text.font.FontWeight.Companion.W500
+import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.unit.sp
 
 // Set of Material typography styles to start with
@@ -36,27 +39,32 @@ val Typography = Typography(
 val recipesAppTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = montserratAlternatesFontFamily,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = W600,
         fontSize = 20.sp
     ),
     titleMedium = TextStyle(
         fontFamily = montserratAlternatesFontFamily,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = W600,
         fontSize = 16.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = montserratFontFamily,
-        fontWeight = FontWeight.Medium,
+        fontWeight = W400,
         fontSize = 14.sp
     ),
     bodySmall = TextStyle(
         fontFamily = montserratFontFamily,
-        fontWeight = FontWeight.Medium,
+        fontWeight = W500,
         fontSize = 12.sp
     ),
     labelLarge = TextStyle(
         fontFamily = montserratFontFamily,
-        fontWeight = FontWeight.Normal,
+        fontWeight = W600,
         fontSize = 16.sp
-    )
+    ),
+    labelMedium = TextStyle(
+        fontFamily = montserratFontFamily,
+        fontWeight = W400,
+        fontSize = 16.sp
+    ),
 )

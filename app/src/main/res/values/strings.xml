@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name" translatable="false">ComposeApp</string>
-    <string name="screen_categories">Экран Категорий</string>
-    <string name="screen_favorites">Экран Избранного</string>
-    <string name="categories">категории</string>
-    <string name="favorites">избранное</string>
-    <string name="categories_header_image_description">Фон с разнообразной едой</string>
+    <string name="title_screen_categories">Экран Категорий</string>
+    <string name="title_empty_favorites_list">Вы еще не добавили ни одного рецепта в избранное</string>
+    <string name="title_categories">категории</string>
+    <string name="title_favorites">избранное</string>
+    <string name="title_recipes">рецепты</string>
+    <string name="image_description_categories_header">Фон с разнообразной едой</string>
 </resources>

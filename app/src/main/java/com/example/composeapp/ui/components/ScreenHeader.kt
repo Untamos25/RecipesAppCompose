@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.composeapp.R
 import com.example.composeapp.ui.theme.Dimens
 import com.example.composeapp.ui.theme.RecipesAppTheme
-import com.example.composeapp.ui.theme.recipesAppTypography
 
 @Composable
 fun ScreenHeader(
@@ -36,7 +35,7 @@ fun ScreenHeader(
     ) {
         Image(
             painter = painterResource(imageResId),
-            contentDescription = stringResource(R.string.categories_header_image_description),
+            contentDescription = stringResource(R.string.image_description_categories_header),
             modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.Crop
         )
@@ -60,7 +59,7 @@ fun Title(title: String, modifier: Modifier = Modifier) {
         Text(
             color = MaterialTheme.colorScheme.primary,
             text = title.uppercase(),
-            style = recipesAppTypography.displayLarge,
+            style = MaterialTheme.typography.displayLarge,
             modifier = Modifier.padding(Dimens.paddingBig)
         )
     }
@@ -72,8 +71,8 @@ fun Title(title: String, modifier: Modifier = Modifier) {
 fun ScreenHeaderLightPreview() {
     RecipesAppTheme {
         ScreenHeader(
-            imageResId = R.drawable.categories,
-            titleResId = R.string.categories
+            imageResId = R.drawable.img_header_categories,
+            titleResId = R.string.title_categories
         )
     }
 }
@@ -83,8 +82,8 @@ fun ScreenHeaderLightPreview() {
 fun ScreenHeaderDarkPreview() {
     RecipesAppTheme {
         ScreenHeader(
-            imageResId = R.drawable.categories,
-            titleResId = R.string.categories
+            imageResId = R.drawable.img_header_categories,
+            titleResId = R.string.title_categories
         )
     }
 }

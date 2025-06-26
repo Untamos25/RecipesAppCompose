@@ -19,8 +19,7 @@ val DividerColor = Color(0xFFF5F5F5)
 
 // Текст
 val TextPrimaryColor = Color(0xFFE6E6E6)
-val TextSecondaryColor = Color(0xFFE6E6E6)
-//val TextSecondaryColor = Color(0xFFB0B0B0)
+val TextSecondaryColor = Color(0xFF666666)
 
 
 // Тёмная тема
@@ -38,5 +37,4 @@ val SurfaceColorDark = Color(0xFF1E1E1E)
 
 // Текст
 val TextPrimaryColorDark = Color(0xFF000000)
-val TextSecondaryColorDark = Color(0xFF000000)
-//val TextSecondaryColorDark = Color(0xFF666666)
+val TextSecondaryColorDark = Color(0xFF888888)

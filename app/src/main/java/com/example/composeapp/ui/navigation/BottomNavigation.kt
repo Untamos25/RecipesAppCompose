@@ -23,7 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.composeapp.R
 import com.example.composeapp.ui.theme.Dimens
 import com.example.composeapp.ui.theme.RecipesAppTheme
-import com.example.composeapp.ui.theme.recipesAppTypography
 
 @Composable
 fun BottomNavigation(
@@ -47,8 +46,8 @@ fun BottomNavigation(
                 .weight(1f)
         ) {
             Text(
-                text = stringResource(R.string.categories).uppercase(),
-                style = recipesAppTypography.titleMedium,
+                text = stringResource(R.string.title_categories).uppercase(),
+                style = MaterialTheme.typography.titleMedium,
                 color = Color.White
             )
         }
@@ -63,8 +62,8 @@ fun BottomNavigation(
                 .weight(1f)
         ) {
             Text(
-                text = stringResource(R.string.favorites).uppercase(),
-                style = recipesAppTypography.titleMedium,
+                text = stringResource(R.string.title_favorites).uppercase(),
+                style = MaterialTheme.typography.titleMedium,
                 color = Color.White,
                 modifier = Modifier.padding(end = Dimens.paddingBig)
             )

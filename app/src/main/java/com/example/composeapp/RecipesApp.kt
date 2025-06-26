@@ -1,25 +1,21 @@
 package com.example.composeapp
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.composeapp.model.ScreenId
 import com.example.composeapp.ui.screens.CategoriesScreen
 import com.example.composeapp.ui.navigation.BottomNavigation
+import com.example.composeapp.ui.screens.FavoritesScreen
 import com.example.composeapp.ui.theme.RecipesAppTheme
-import com.example.composeapp.ui.theme.recipesAppTypography
 
 @Composable
 fun RecipesApp() {
@@ -46,19 +42,6 @@ fun RecipesApp() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun FavoritesScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = stringResource(R.string.screen_favorites),
-            style = recipesAppTypography.displayLarge
-        )
     }
 }
 
