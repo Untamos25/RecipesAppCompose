@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">ComposeApp</string>
+    <string name="app_name" translatable="false">ComposeApp</string>
+    <string name="screen_categories">Экран Категорий</string>
+    <string name="screen_favorites">Экран Избранного</string>
+    <string name="categories">категории</string>
+    <string name="favorites">избранное</string>
+    <string name="categories_header_image_description">Фон с разнообразной едой</string>
 </resources>

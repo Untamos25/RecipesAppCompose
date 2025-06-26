@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screen_categories">Categories Screen</string>
+    <string name="screen_favorites">Favorites Screen</string>
+    <string name="categories">categories</string>
+    <string name="favorites">favorites</string>
+    <string name="categories_header_image_description">A background with a variety of food</string>
+</resources>
