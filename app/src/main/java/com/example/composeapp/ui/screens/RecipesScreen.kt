@@ -4,23 +4,20 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.composeapp.R
 import com.example.composeapp.ui.components.ScreenHeader
 import com.example.composeapp.ui.theme.RecipesAppTheme
 
 @Composable
-fun CategoriesScreen() {
+fun RecipesScreen() {
     Column {
         ScreenHeader(
-            titleResId = R.string.title_categories,
-            imageResId = R.drawable.img_header_categories,
+            titleResId = R.string.title_recipes,
+            imageResId = R.drawable.img_placeholder,
         )
 
         Box(
@@ -28,12 +25,7 @@ fun CategoriesScreen() {
                 .fillMaxWidth()
                 .weight(1f),
             contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = stringResource(R.string.title_screen_categories),
-                style = MaterialTheme.typography.displayLarge
-            )
-        }
+        ) { }
     }
 }
 
@@ -43,9 +35,9 @@ fun CategoriesScreen() {
     showBackground = true,
 )
 @Composable
-fun CategoriesScreenLightPreview() {
+fun RecipesScreenLightPreview() {
     RecipesAppTheme {
-        CategoriesScreen()
+        RecipesScreen()
     }
 }
 
@@ -55,8 +47,8 @@ fun CategoriesScreenLightPreview() {
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-fun CategoriesScreenDarkPreview() {
+fun RecipesScreenDarkPreview() {
     RecipesAppTheme {
-        CategoriesScreen()
+        RecipesScreen()
     }
 }

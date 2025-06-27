@@ -9,7 +9,6 @@ object Dimens {
     val paddingMedium = 8.dp
     val paddingSmall = 4.dp
 
-
     // Размеры
     val iconSizeMedium = 24.dp
     val headerImageSize = 224.dp
