@@ -1,5 +1,9 @@
 package com.example.composeapp.data.repository
 
+import com.example.composeapp.data.model.CategoryDto
+import com.example.composeapp.data.model.IngredientDto
+import com.example.composeapp.data.model.RecipeDto
+
 object RecipesRepositoryStub {
     private val categories = listOf(
         CategoryDto(
@@ -85,13 +89,13 @@ object RecipesRepositoryStub {
             imageUrl = "burger_classic.png"
         )
     )
-}
 
-fun getCategories(): List<CategoryDto> = categories
+    fun getCategories(): List<CategoryDto> = categories
 
-fun getRecipesByCategoryId(categoryId: Int): List<RecipeDto> {
-    return when (categoryId) {
-        0 -> recipes
-        else -> emptyList()
+    fun getRecipesByCategoryId(categoryId: Int): List<RecipeDto> {
+        return when (categoryId) {
+            0 -> recipes
+            else -> emptyList()
+        }
     }
 }
