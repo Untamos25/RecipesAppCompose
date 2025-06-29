@@ -1,4 +1,4 @@
-package com.example.composeapp
+package com.example.composeapp.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.composeapp.model.ScreenId
+import com.example.composeapp.ui.navigation.ScreenId
 import com.example.composeapp.ui.screens.CategoriesScreen
 import com.example.composeapp.ui.navigation.BottomNavigation
 import com.example.composeapp.ui.screens.FavoritesScreen
