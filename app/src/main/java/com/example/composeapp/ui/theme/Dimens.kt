@@ -15,4 +15,12 @@ object Dimens {
 
     // Радиусы скругления
     val cornerRadiusMedium = 8.dp
+
+    // Параметры тени элементов
+    val shadowElevation = 2.dp
+
+    // Размеры для карточки категории
+    val categoryCardWidth = 156.dp
+    val categoryCardHeight = 220.dp
+    val categoryCardImageHeight = 130.dp
 }
