@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.composeapp.R
+import com.example.composeapp.data.model.mapper.toUiModel
 import com.example.composeapp.data.repository.RecipesRepositoryStub
 import com.example.composeapp.ui.components.CategoryItem
 import com.example.composeapp.ui.components.ScreenHeader
@@ -23,7 +24,7 @@ import com.example.composeapp.ui.theme.RecipesAppTheme
 @Composable
 fun CategoriesScreen() {
 
-    val categories = RecipesRepositoryStub.getCategories()
+    val categories = RecipesRepositoryStub.getCategories().map { it.toUiModel() }
 
     Column {
         ScreenHeader(
@@ -43,12 +44,9 @@ fun CategoriesScreen() {
                 horizontalArrangement = Arrangement.spacedBy(Dimens.paddingLarge),
                 verticalArrangement = Arrangement.spacedBy(Dimens.paddingLarge)
             ) {
-
-//                TODO("использовать мапперы")
-
                 items(items = categories) { category ->
                     CategoryItem(
-                        imageUri = "file:///android_asset/${category.imageUrl}",
+                        imageUri = category.imageUrl,
                         title = category.title,
                         description = category.description,
                         onCLick = {}
