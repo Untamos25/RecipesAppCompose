@@ -1,4 +1,4 @@
-package com.example.composeapp.model
+package com.example.composeapp.ui.navigation
 
 enum class ScreenId {
     CATEGORIES,
