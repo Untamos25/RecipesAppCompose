@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name" translatable="false">Recipes</string>
-    <string name="title_screen_categories">Экран Категорий</string>
     <string name="title_empty_favorites_list">Вы еще не добавили ни одного рецепта в избранное</string>
     <string name="title_categories">категории</string>
     <string name="title_favorites">избранное</string>
