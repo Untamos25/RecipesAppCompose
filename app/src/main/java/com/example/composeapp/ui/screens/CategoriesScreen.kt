@@ -18,11 +18,12 @@ import com.example.composeapp.data.model.mapper.toUiModel
 import com.example.composeapp.data.repository.RecipesRepositoryStub
 import com.example.composeapp.ui.components.CategoryItem
 import com.example.composeapp.ui.components.ScreenHeader
+import com.example.composeapp.ui.model.CategoryUiModel
 import com.example.composeapp.ui.theme.Dimens
 import com.example.composeapp.ui.theme.RecipesAppTheme
 
 @Composable
-fun CategoriesScreen() {
+fun CategoriesScreen(onCategoryClick: (category: CategoryUiModel) -> Unit) {
 
     val categories = RecipesRepositoryStub.getCategories().map { it.toUiModel() }
 
@@ -49,7 +50,7 @@ fun CategoriesScreen() {
                         imageUri = category.imageUrl,
                         title = category.title,
                         description = category.description,
-                        onCLick = {}
+                        onClick = { onCategoryClick(category) }
                     )
                 }
             }
@@ -64,7 +65,7 @@ fun CategoriesScreen() {
 @Composable
 fun CategoriesScreenLightPreview() {
     RecipesAppTheme {
-        CategoriesScreen()
+        CategoriesScreen(onCategoryClick = {})
     }
 }
 
@@ -76,6 +77,6 @@ fun CategoriesScreenLightPreview() {
 @Composable
 fun CategoriesScreenDarkPreview() {
     RecipesAppTheme {
-        CategoriesScreen()
+        CategoriesScreen(onCategoryClick = {})
     }
 }

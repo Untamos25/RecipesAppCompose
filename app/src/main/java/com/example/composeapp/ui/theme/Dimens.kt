@@ -23,4 +23,7 @@ object Dimens {
     val categoryCardWidth = 156.dp
     val categoryCardHeight = 220.dp
     val categoryCardImageHeight = 130.dp
+
+    // Размеры для карточки рецепта
+    val recipeCardImageHeight = 100.dp
 }

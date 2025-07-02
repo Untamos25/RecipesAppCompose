@@ -11,10 +11,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.composeapp.ui.model.CategoryUiModel
+import com.example.composeapp.ui.navigation.BottomNavigation
 import com.example.composeapp.ui.navigation.ScreenId
 import com.example.composeapp.ui.screens.CategoriesScreen
-import com.example.composeapp.ui.navigation.BottomNavigation
 import com.example.composeapp.ui.screens.FavoritesScreen
+import com.example.composeapp.ui.screens.RecipesScreen
 import com.example.composeapp.ui.theme.RecipesAppTheme
 
 @Composable
@@ -22,6 +24,7 @@ fun RecipesApp() {
     RecipesAppTheme {
 
         var currentScreen by remember { mutableStateOf(ScreenId.CATEGORIES) }
+        var selectedCategory by remember { mutableStateOf<CategoryUiModel?>(null) }
 
         Scaffold(
             bottomBar = {
@@ -37,8 +40,14 @@ fun RecipesApp() {
                     .padding(innerPadding)
             ) {
                 when (currentScreen) {
-                    ScreenId.CATEGORIES -> CategoriesScreen()
+                    ScreenId.CATEGORIES -> CategoriesScreen(
+                        onCategoryClick = { category ->
+                            selectedCategory = category
+                            currentScreen = ScreenId.RECIPES
+                        }
+                    )
                     ScreenId.FAVORITES -> FavoritesScreen()
+                    ScreenId.RECIPES -> RecipesScreen(selectedCategory)
                 }
             }
         }

@@ -1,34 +1,73 @@
 package com.example.composeapp.ui.screens
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.composeapp.R
+import com.example.composeapp.data.model.mapper.toRecipeCardUiModel
+import com.example.composeapp.data.repository.RecipesRepositoryStub.getRecipesByCategoryId
+import com.example.composeapp.ui.components.RecipeItem
 import com.example.composeapp.ui.components.ScreenHeader
+import com.example.composeapp.ui.model.CategoryUiModel
+import com.example.composeapp.ui.model.RecipeUiModel
+import com.example.composeapp.ui.theme.Dimens
 import com.example.composeapp.ui.theme.RecipesAppTheme
 
 @Composable
-fun RecipesScreen() {
+fun RecipesScreen(category: CategoryUiModel?) {
+
+    if (category == null) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(stringResource(R.string.title_category_not_found))
+        }
+        return
+    }
+
+    var recipes by remember { mutableStateOf<List<RecipeUiModel>>(emptyList()) }
+
+    LaunchedEffect(category.id) {
+        recipes = getRecipesByCategoryId(category.id).map { it.toRecipeCardUiModel() }
+    }
+
     Column {
         ScreenHeader(
-            titleResId = R.string.title_recipes,
-            imageResId = R.drawable.img_placeholder,
+            title = category.title,
+            imageUrl = category.imageUrl,
         )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            contentAlignment = Alignment.Center
-        ) { }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(Dimens.paddingLarge),
+            verticalArrangement = Arrangement.spacedBy(Dimens.paddingMedium)
+        ) {
+            items(items = recipes) { recipe ->
+                RecipeItem(
+                    imageUri = recipe.imageUrl,
+                    title = recipe.title,
+                    onClick = {}
+                )
+            }
+        }
     }
 }
-
 
 @Preview(
     name = "LightTheme",
@@ -37,7 +76,14 @@ fun RecipesScreen() {
 @Composable
 fun RecipesScreenLightPreview() {
     RecipesAppTheme {
-        RecipesScreen()
+        RecipesScreen(
+            CategoryUiModel(
+                id = 0,
+                title = "Бургеры",
+                description = "",
+                imageUrl = "file:///android_asset/burger.png"
+            )
+        )
     }
 }
 
@@ -49,6 +95,26 @@ fun RecipesScreenLightPreview() {
 @Composable
 fun RecipesScreenDarkPreview() {
     RecipesAppTheme {
-        RecipesScreen()
+        RecipesScreen(
+            CategoryUiModel(
+                id = 0,
+                title = "Бургеры",
+                description = "",
+                imageUrl = "file:///android_asset/burger.png"
+            )
+        )
+    }
+}
+
+@Preview(
+    name = "CategoryNotFound",
+    showBackground = true,
+)
+@Composable
+fun CategoryNotFoundPreview() {
+    RecipesAppTheme {
+        RecipesScreen(
+            null
+        )
     }
 }
