@@ -20,16 +20,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.composeapp.R
 import com.example.composeapp.data.model.mapper.toRecipeCardUiModel
+import com.example.composeapp.data.model.mapper.toUiModel
+import com.example.composeapp.data.repository.RecipesRepositoryStub
 import com.example.composeapp.data.repository.RecipesRepositoryStub.getRecipesByCategoryId
 import com.example.composeapp.ui.components.RecipeItem
 import com.example.composeapp.ui.components.ScreenHeader
-import com.example.composeapp.ui.model.CategoryUiModel
 import com.example.composeapp.ui.model.RecipeUiModel
 import com.example.composeapp.ui.theme.Dimens
 import com.example.composeapp.ui.theme.RecipesAppTheme
 
 @Composable
-fun RecipesScreen(category: CategoryUiModel?) {
+fun RecipesScreen(categoryId: Int) {
+
+    val category = remember(categoryId) {
+        RecipesRepositoryStub.getCategories()
+            .find { it.id == categoryId }
+            ?.toUiModel()
+    }
 
     if (category == null) {
         Column(
@@ -42,7 +49,7 @@ fun RecipesScreen(category: CategoryUiModel?) {
         return
     }
 
-    var recipes by remember { mutableStateOf<List<RecipeUiModel>>(emptyList()) }
+    var recipes by remember(category.id) { mutableStateOf<List<RecipeUiModel>>(emptyList()) }
 
     LaunchedEffect(category.id) {
         recipes = getRecipesByCategoryId(category.id).map { it.toRecipeCardUiModel() }
@@ -76,14 +83,7 @@ fun RecipesScreen(category: CategoryUiModel?) {
 @Composable
 fun RecipesScreenLightPreview() {
     RecipesAppTheme {
-        RecipesScreen(
-            CategoryUiModel(
-                id = 0,
-                title = "Бургеры",
-                description = "",
-                imageUrl = "file:///android_asset/burger.png"
-            )
-        )
+        RecipesScreen(categoryId = 0)
     }
 }
 
@@ -95,14 +95,7 @@ fun RecipesScreenLightPreview() {
 @Composable
 fun RecipesScreenDarkPreview() {
     RecipesAppTheme {
-        RecipesScreen(
-            CategoryUiModel(
-                id = 0,
-                title = "Бургеры",
-                description = "",
-                imageUrl = "file:///android_asset/burger.png"
-            )
-        )
+        RecipesScreen(categoryId = 0)
     }
 }
 
@@ -113,8 +106,6 @@ fun RecipesScreenDarkPreview() {
 @Composable
 fun CategoryNotFoundPreview() {
     RecipesAppTheme {
-        RecipesScreen(
-            null
-        )
+        RecipesScreen(categoryId = -1)
     }
 }
