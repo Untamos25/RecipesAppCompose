@@ -3,6 +3,6 @@
     <string name="title_empty_favorites_list">Вы еще не добавили ни одного рецепта в избранное</string>
     <string name="title_categories">категории</string>
     <string name="title_favorites">избранное</string>
-    <string name="title_recipes">рецепты</string>
+    <string name="title_category_not_found">Категория не найдена</string>
     <string name="image_description_categories_header">Фон с разнообразной едой</string>
 </resources>

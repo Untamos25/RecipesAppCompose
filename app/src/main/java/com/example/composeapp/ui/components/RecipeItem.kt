@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,7 +17,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -27,17 +25,16 @@ import com.example.composeapp.ui.theme.Dimens
 import com.example.composeapp.ui.theme.RecipesAppTheme
 
 @Composable
-fun CategoryItem(
+fun RecipeItem(
     imageUri: String,
     title: String,
-    description: String,
     onClick: () -> Unit
 ) {
     val cardShape = RoundedCornerShape(Dimens.cornerRadiusMedium)
 
     Column(
         modifier = Modifier
-            .size(height = Dimens.categoryCardHeight, width = Dimens.categoryCardWidth)
+            .fillMaxWidth()
             .shadow(
                 elevation = Dimens.shadowElevation,
                 shape = cardShape
@@ -56,7 +53,7 @@ fun CategoryItem(
             error = painterResource(R.drawable.img_error),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(Dimens.categoryCardImageHeight),
+                .height(Dimens.recipeCardImageHeight),
             contentScale = ContentScale.Crop
         )
         Text(
@@ -65,29 +62,16 @@ fun CategoryItem(
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(Dimens.paddingMedium)
         )
-        Text(
-            text = description,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSecondary,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(
-                start = Dimens.paddingMedium,
-                end = Dimens.paddingMedium,
-                bottom = Dimens.paddingMedium
-            )
-        )
     }
 }
 
 @Preview(name = "LightTheme")
 @Composable
-fun CategoryItemLightPreview() {
+fun RecipeItemLightPreview() {
     RecipesAppTheme {
-        CategoryItem(
+        RecipeItem(
             imageUri = "",
             title = "Заголовок",
-            description = "Описание на несколько строк на карточке",
             onClick = {}
         )
     }
@@ -95,12 +79,11 @@ fun CategoryItemLightPreview() {
 
 @Preview(name = "DarkTheme", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun CategoryItemDarkPreview() {
+fun RecipeItemDarkPreview() {
     RecipesAppTheme {
-        CategoryItem(
+        RecipeItem(
             imageUri = "",
             title = "Заголовок",
-            description = "Описание на несколько строк на карточке",
             onClick = {}
         )
     }

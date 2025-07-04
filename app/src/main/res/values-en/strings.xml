@@ -3,6 +3,6 @@
     <string name="title_empty_favorites_list">You haven\'t added any recipes to your favourites yet</string>
     <string name="title_categories">categories</string>
     <string name="title_favorites">favorites</string>
-    <string name="title_recipes">recipes</string>
+    <string name="title_category_not_found">Category not found</string>
     <string name="image_description_categories_header">A background with a variety of food</string>
 </resources>

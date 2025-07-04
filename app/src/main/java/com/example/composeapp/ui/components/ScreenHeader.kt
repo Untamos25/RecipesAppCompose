@@ -3,7 +3,6 @@ package com.example.composeapp.ui.components
 import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,32 +15,46 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.composeapp.R
 import com.example.composeapp.ui.theme.Dimens
 import com.example.composeapp.ui.theme.RecipesAppTheme
 
 @Composable
 fun ScreenHeader(
-    @StringRes titleResId: Int,
-    @DrawableRes imageResId: Int,
+    title: String? = null,
+    @StringRes titleResId: Int? = null,
+    imageUrl: String? = null,
+    @DrawableRes imageResId: Int? = null,
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(Dimens.headerImageSize)
     ) {
-        Image(
-            painter = painterResource(imageResId),
+        val imageModel = imageUrl ?: imageResId
+
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageModel)
+                .crossfade(true)
+                .build(),
             contentDescription = stringResource(R.string.image_description_categories_header),
+            placeholder = painterResource(R.drawable.img_placeholder),
+            error = painterResource(R.drawable.img_error),
             modifier = Modifier.fillMaxWidth(),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
         )
 
+        val headerTitle = title ?: (titleResId?.let { stringResource(id = it) } ?: "")
+
         Title(
-            title = stringResource(id = titleResId),
+            title = headerTitle,
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(Dimens.paddingLarge)
