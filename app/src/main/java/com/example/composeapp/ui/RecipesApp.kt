@@ -5,15 +5,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.composeapp.ui.model.CategoryUiModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.composeapp.data.CATEGORY_ID
 import com.example.composeapp.ui.navigation.BottomNavigation
-import com.example.composeapp.ui.navigation.ScreenId
+import com.example.composeapp.ui.navigation.Destination
 import com.example.composeapp.ui.screens.CategoriesScreen
 import com.example.composeapp.ui.screens.FavoritesScreen
 import com.example.composeapp.ui.screens.RecipesScreen
@@ -23,14 +24,13 @@ import com.example.composeapp.ui.theme.RecipesAppTheme
 fun RecipesApp() {
     RecipesAppTheme {
 
-        var currentScreen by remember { mutableStateOf(ScreenId.CATEGORIES) }
-        var selectedCategory by remember { mutableStateOf<CategoryUiModel?>(null) }
+        val navController = rememberNavController()
 
         Scaffold(
             bottomBar = {
                 BottomNavigation(
-                    onCategoriesClick = { currentScreen = ScreenId.CATEGORIES },
-                    onFavoriteClick = { currentScreen = ScreenId.FAVORITES }
+                    onCategoriesClick = { navController.navigate(Destination.Categories.route) },
+                    onFavoriteClick = { navController.navigate(Destination.Favorites.route) }
                 )
             }
         ) { innerPadding ->
@@ -39,15 +39,27 @@ fun RecipesApp() {
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                when (currentScreen) {
-                    ScreenId.CATEGORIES -> CategoriesScreen(
-                        onCategoryClick = { category ->
-                            selectedCategory = category
-                            currentScreen = ScreenId.RECIPES
+                NavHost(
+                    navController = navController,
+                    startDestination = Destination.Categories.route
+                ) {
+                    composable(route = Destination.Categories.route) {
+                        CategoriesScreen { category ->
+                            navController.navigate(Destination.Recipes.createRoute(category.id))
                         }
-                    )
-                    ScreenId.FAVORITES -> FavoritesScreen()
-                    ScreenId.RECIPES -> RecipesScreen(selectedCategory)
+                    }
+
+                    composable(route = Destination.Favorites.route) {
+                        FavoritesScreen()
+                    }
+
+                    composable(
+                        route = Destination.Recipes.route,
+                        arguments = listOf(navArgument(CATEGORY_ID) { type = NavType.IntType })
+                    ) { backStackEntry ->
+                        val categoryId = backStackEntry.arguments?.getInt(CATEGORY_ID) ?: 0
+                        RecipesScreen(categoryId = categoryId)
+                    }
                 }
             }
         }
