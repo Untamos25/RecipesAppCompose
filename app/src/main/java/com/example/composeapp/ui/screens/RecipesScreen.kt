@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.composeapp.R
-import com.example.composeapp.data.model.mapper.toRecipeCardUiModel
 import com.example.composeapp.data.model.mapper.toUiModel
 import com.example.composeapp.data.repository.RecipesRepositoryStub
 import com.example.composeapp.data.repository.RecipesRepositoryStub.getRecipesByCategoryId
@@ -30,7 +29,10 @@ import com.example.composeapp.ui.theme.Dimens
 import com.example.composeapp.ui.theme.RecipesAppTheme
 
 @Composable
-fun RecipesScreen(categoryId: Int) {
+fun RecipesScreen(
+    categoryId: Int,
+    onRecipeClick: (recipe: RecipeUiModel) -> Unit
+) {
 
     val category = remember(categoryId) {
         RecipesRepositoryStub.getCategories()
@@ -52,7 +54,7 @@ fun RecipesScreen(categoryId: Int) {
     var recipes by remember(category.id) { mutableStateOf<List<RecipeUiModel>>(emptyList()) }
 
     LaunchedEffect(category.id) {
-        recipes = getRecipesByCategoryId(category.id).map { it.toRecipeCardUiModel() }
+        recipes = getRecipesByCategoryId(category.id).map { it.toUiModel() }
     }
 
     Column {
@@ -69,7 +71,7 @@ fun RecipesScreen(categoryId: Int) {
                 RecipeItem(
                     imageUri = recipe.imageUrl,
                     title = recipe.title,
-                    onClick = {}
+                    onClick = {onRecipeClick(recipe)}
                 )
             }
         }
@@ -83,7 +85,7 @@ fun RecipesScreen(categoryId: Int) {
 @Composable
 fun RecipesScreenLightPreview() {
     RecipesAppTheme {
-        RecipesScreen(categoryId = 0)
+        RecipesScreen(categoryId = 0, onRecipeClick = {})
     }
 }
 
@@ -95,7 +97,7 @@ fun RecipesScreenLightPreview() {
 @Composable
 fun RecipesScreenDarkPreview() {
     RecipesAppTheme {
-        RecipesScreen(categoryId = 0)
+        RecipesScreen(categoryId = 0, onRecipeClick = {})
     }
 }
 
@@ -106,6 +108,6 @@ fun RecipesScreenDarkPreview() {
 @Composable
 fun CategoryNotFoundPreview() {
     RecipesAppTheme {
-        RecipesScreen(categoryId = -1)
+        RecipesScreen(categoryId = -1, onRecipeClick = {})
     }
 }
