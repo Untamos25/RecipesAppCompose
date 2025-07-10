@@ -13,10 +13,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.composeapp.data.CATEGORY_ID
+import com.example.composeapp.data.RECIPE_ARG
+import com.example.composeapp.data.RECIPE_ID
+import com.example.composeapp.ui.model.RecipeUiModel
 import com.example.composeapp.ui.navigation.BottomNavigation
 import com.example.composeapp.ui.navigation.Destination
 import com.example.composeapp.ui.screens.CategoriesScreen
 import com.example.composeapp.ui.screens.FavoritesScreen
+import com.example.composeapp.ui.screens.RecipeDetailsScreen
 import com.example.composeapp.ui.screens.RecipesScreen
 import com.example.composeapp.ui.theme.RecipesAppTheme
 
@@ -58,7 +62,28 @@ fun RecipesApp() {
                         arguments = listOf(navArgument(CATEGORY_ID) { type = NavType.IntType })
                     ) { backStackEntry ->
                         val categoryId = backStackEntry.arguments?.getInt(CATEGORY_ID) ?: 0
-                        RecipesScreen(categoryId = categoryId)
+                        RecipesScreen(
+                            categoryId = categoryId,
+                            onRecipeClick = { recipe ->
+                                navController.currentBackStackEntry?.savedStateHandle?.set(
+                                    key = RECIPE_ARG,
+                                    value = recipe
+                                )
+                                navController.navigate(
+                                    Destination.RecipeDetail.createRoute(recipe.id)
+                                )
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = Destination.RecipeDetail.route,
+                        arguments = listOf(navArgument(RECIPE_ID) { type = NavType.IntType })
+                    ) {
+                        val recipe = navController.previousBackStackEntry
+                            ?.savedStateHandle
+                            ?.get<RecipeUiModel>(RECIPE_ARG)
+                        RecipeDetailsScreen(recipe = recipe)
                     }
                 }
             }
