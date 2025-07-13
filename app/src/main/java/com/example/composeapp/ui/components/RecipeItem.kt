@@ -60,7 +60,7 @@ fun RecipeItem(
             text = title.uppercase(),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(Dimens.paddingMedium)
+            modifier = Modifier.padding(Dimens.paddingSmall)
         )
     }
 }

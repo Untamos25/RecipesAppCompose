@@ -65,7 +65,7 @@ fun RecipesScreen(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(Dimens.paddingLarge),
-            verticalArrangement = Arrangement.spacedBy(Dimens.paddingMedium)
+            verticalArrangement = Arrangement.spacedBy(Dimens.paddingSmall)
         ) {
             items(items = recipes) { recipe ->
                 RecipeItem(

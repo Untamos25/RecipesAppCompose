@@ -4,5 +4,31 @@
     <string name="title_categories">категории</string>
     <string name="title_favorites">избранное</string>
     <string name="title_category_not_found">Категория не найдена</string>
+    <string name="title_recipe_not_found">Рецепт не найден</string>
     <string name="image_description_categories_header">Фон с разнообразной едой</string>
+    <string name="title_ingredients">Ингредиенты</string>
+    <string name="title_cooking_method">Способ приготовления</string>
+    <string name="portions_count">Порций: %d</string>
+
+    <plurals name="unit_piece">
+        <item quantity="one">штука</item>
+        <item quantity="few">штуки</item>
+        <item quantity="many">штук</item>
+        <item quantity="other">штуки</item>
+    </plurals>
+
+    <plurals name="unit_tablespoon">
+        <item quantity="one">стол. ложка</item>
+        <item quantity="few">стол. ложки</item>
+        <item quantity="many">стол. ложек</item>
+        <item quantity="other">стол. ложки</item>
+    </plurals>
+
+    <plurals name="unit_clove">
+        <item quantity="one">зубчик</item>
+        <item quantity="few">зубчика</item>
+        <item quantity="many">зубчиков</item>
+        <item quantity="other">зубчика</item>
+    </plurals>
+
 </resources>
