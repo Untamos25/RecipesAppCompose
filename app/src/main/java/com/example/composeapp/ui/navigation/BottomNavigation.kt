@@ -34,7 +34,7 @@ fun BottomNavigation(
             .fillMaxWidth()
             .padding(horizontal = Dimens.paddingLarge)
             .padding(
-                top = Dimens.paddingMedium,
+                top = Dimens.paddingSmall,
                 bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             )
     ) {
@@ -52,7 +52,7 @@ fun BottomNavigation(
             )
         }
 
-        Spacer(modifier = Modifier.size(Dimens.paddingSmall))
+        Spacer(modifier = Modifier.size(Dimens.paddingTiny))
 
         Button(
             onClick = onFavoriteClick,
@@ -65,7 +65,7 @@ fun BottomNavigation(
                 text = stringResource(R.string.title_favorites).uppercase(),
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White,
-                modifier = Modifier.padding(end = Dimens.paddingBig)
+                modifier = Modifier.padding(end = Dimens.paddingMedium)
             )
             Icon(
                 painter = painterResource(id = R.drawable.ic_heart_empty),

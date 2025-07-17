@@ -73,7 +73,7 @@ fun Title(title: String, modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.primary,
             text = title.uppercase(),
             style = MaterialTheme.typography.displayLarge,
-            modifier = Modifier.padding(Dimens.paddingBig)
+            modifier = Modifier.padding(Dimens.paddingMedium)
         )
     }
 }

@@ -4,5 +4,25 @@
     <string name="title_categories">categories</string>
     <string name="title_favorites">favorites</string>
     <string name="title_category_not_found">Category not found</string>
+    <string name="title_recipe_not_found">Recipe not found</string>
     <string name="image_description_categories_header">A background with a variety of food</string>
+    <string name="title_ingredients">Ingredients</string>
+    <string name="title_cooking_method">Cooking method</string>
+    <string name="portions_count">Servings: %d</string>
+
+    <plurals name="unit_piece">
+        <item quantity="one">piece</item>
+        <item quantity="other">pieces</item>
+    </plurals>
+
+    <plurals name="unit_tablespoon">
+        <item quantity="one">tablespoon</item>
+        <item quantity="other">tablespoons</item>
+    </plurals>
+
+    <plurals name="unit_clove">
+        <item quantity="one">clove</item>
+        <item quantity="other">cloves</item>
+    </plurals>
+
 </resources>

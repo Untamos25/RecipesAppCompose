@@ -63,7 +63,7 @@ fun CategoryItem(
             text = title.uppercase(),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(Dimens.paddingMedium)
+            modifier = Modifier.padding(Dimens.paddingSmall)
         )
         Text(
             text = description,
@@ -72,9 +72,9 @@ fun CategoryItem(
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(
-                start = Dimens.paddingMedium,
-                end = Dimens.paddingMedium,
-                bottom = Dimens.paddingMedium
+                start = Dimens.paddingSmall,
+                end = Dimens.paddingSmall,
+                bottom = Dimens.paddingSmall
             )
         )
     }
