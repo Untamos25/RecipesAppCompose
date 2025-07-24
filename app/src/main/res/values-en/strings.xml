@@ -10,6 +10,8 @@
     <string name="title_cooking_method">Cooking method</string>
     <string name="portions_count">Servings: %d</string>
 
+    <string name="unit_weight">kg</string>
+
     <plurals name="unit_piece">
         <item quantity="one">piece</item>
         <item quantity="other">pieces</item>

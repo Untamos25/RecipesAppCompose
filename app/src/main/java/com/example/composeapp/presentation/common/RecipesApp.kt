@@ -1,107 +1,80 @@
 package com.example.composeapp.presentation.common
 
-import androidx.compose.foundation.layout.Column
+import android.content.res.Configuration
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.composeapp.presentation.categories.CategoriesScreen
-import com.example.composeapp.presentation.common.UIConstants.CATEGORY_ID
-import com.example.composeapp.presentation.common.UIConstants.RECIPE_ID
-import com.example.composeapp.presentation.common.navigation.BottomNavigation
+import com.example.composeapp.presentation.common.components.BottomNavigation
+import com.example.composeapp.presentation.common.navigation.AppNavigation
 import com.example.composeapp.presentation.common.navigation.Destination
 import com.example.composeapp.presentation.common.theme.RecipesAppTheme
-import com.example.composeapp.presentation.favorites.FavoritesScreen
-import com.example.composeapp.presentation.recipes.detail.RecipeDetailsScreen
-import com.example.composeapp.presentation.recipes.list.RecipesScreen
 
 @Composable
 fun RecipesApp() {
     RecipesAppTheme {
-
         val navController = rememberNavController()
 
+        RecipesAppContent(
+            onCategoriesClick = { navController.navigate(Destination.Categories.route) },
+            onFavoriteClick = { navController.navigate(Destination.Favorites.route) },
+            content = { modifier ->
+                AppNavigation(
+                    navController = navController,
+                    modifier = modifier
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun RecipesAppContent(
+    onCategoriesClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
+    content: @Composable (modifier: Modifier) -> Unit
+) {
+    RecipesAppTheme {
         Scaffold(
             bottomBar = {
                 BottomNavigation(
-                    onCategoriesClick = { navController.navigate(Destination.Categories.route) },
-                    onFavoriteClick = { navController.navigate(Destination.Favorites.route) }
+                    onCategoriesClick = onCategoriesClick,
+                    onFavoriteClick = onFavoriteClick
                 )
             }
         ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                NavHost(
-                    navController = navController,
-                    startDestination = Destination.Categories.route
-                ) {
-                    composable(route = Destination.Categories.route) {
-                        CategoriesScreen { category ->
-                            navController.navigate(Destination.Recipes.createRoute(category.id))
-                        }
-                    }
-
-                    composable(route = Destination.Favorites.route) {
-                        FavoritesScreen()
-                    }
-
-                    composable(
-                        route = Destination.Recipes.route,
-                        arguments = listOf(navArgument(CATEGORY_ID) { type = NavType.IntType })
-                    ) { backStackEntry ->
-                        val categoryId = backStackEntry.arguments?.getInt(CATEGORY_ID) ?: 0
-                        RecipesScreen(
-                            categoryId = categoryId,
-                            onRecipeClick = { recipeId ->
-                                navController.navigate(
-                                    Destination.RecipeDetail.createRoute(recipeId)
-                                )
-                            }
-                        )
-                    }
-
-                    composable(
-                        route = Destination.RecipeDetail.route,
-                        arguments = listOf(navArgument(RECIPE_ID) { type = NavType.IntType })
-                    ) { backStackEntry ->
-                        val recipeId = backStackEntry.arguments?.getInt(RECIPE_ID) ?: 0
-                        RecipeDetailsScreen(recipeId = recipeId)
-                    }
-                }
-            }
+            content(Modifier.padding(innerPadding))
         }
     }
 }
 
-@Preview(
-    name = "LightTheme",
-    showBackground = true
-)
+@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "en", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun RecipesAppLightPreview() {
+private fun RecipesAppContentPreview() {
     RecipesAppTheme {
-        RecipesApp()
-    }
-}
-
-@Preview(
-    name = "DarkTheme",
-    showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
-)
-@Composable
-fun RecipesAppDarkPreview() {
-    RecipesAppTheme {
-        RecipesApp()
+        RecipesAppContent(
+            onCategoriesClick = {},
+            onFavoriteClick = {},
+            content = { modifier ->
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .border(width = 2.dp, color = Color.Red),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("NavHost")
+                }
+            }
+        )
     }
 }

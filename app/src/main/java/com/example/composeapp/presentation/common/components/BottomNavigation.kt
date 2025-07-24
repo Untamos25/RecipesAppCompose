@@ -1,5 +1,6 @@
-package com.example.composeapp.presentation.common.navigation
+package com.example.composeapp.presentation.common.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -79,28 +80,10 @@ fun BottomNavigation(
 }
 
 
-@Preview(
-    name = "LightTheme",
-    showBackground = true
-)
+@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "en", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun BottomNavigationLightPreview() {
-    RecipesAppTheme {
-        BottomNavigation(
-            onCategoriesClick = {},
-            onFavoriteClick = {}
-        )
-    }
-}
-
-@Preview(
-    name = "DarkTheme",
-    showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
-    locale = "en"
-)
-@Composable
-fun BottomNavigationDarkPreview() {
+private fun BottomNavigationPreview() {
     RecipesAppTheme {
         BottomNavigation(
             onCategoriesClick = {},

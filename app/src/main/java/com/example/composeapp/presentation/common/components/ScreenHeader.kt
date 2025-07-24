@@ -63,7 +63,7 @@ fun ScreenHeader(
 }
 
 @Composable
-fun Title(title: String, modifier: Modifier = Modifier) {
+private fun Title(title: String, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(Dimens.cornerRadiusMedium),
@@ -79,20 +79,10 @@ fun Title(title: String, modifier: Modifier = Modifier) {
 }
 
 
-@Preview(name = "LightTheme")
+@Preview
+@Preview(locale = "en", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun ScreenHeaderLightPreview() {
-    RecipesAppTheme {
-        ScreenHeader(
-            imageResId = R.drawable.img_header_categories,
-            titleResId = R.string.title_categories
-        )
-    }
-}
-
-@Preview(name = "DarkTheme", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun ScreenHeaderDarkPreview() {
+private fun ScreenHeaderPreview() {
     RecipesAppTheme {
         ScreenHeader(
             imageResId = R.drawable.img_header_categories,

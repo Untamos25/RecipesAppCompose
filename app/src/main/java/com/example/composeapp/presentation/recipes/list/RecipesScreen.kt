@@ -9,40 +9,43 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.composeapp.R
-import com.example.composeapp.data.categories.mapper.toDomainModel
-import com.example.composeapp.data.common.source.RecipesRepositoryStub
-import com.example.composeapp.data.common.source.RecipesRepositoryStub.getRecipesByCategoryId
-import com.example.composeapp.data.recipes.mapper.toDomainModel
+import com.example.composeapp.presentation.common.components.RecipeItem
 import com.example.composeapp.presentation.common.components.ScreenHeader
 import com.example.composeapp.presentation.common.theme.Dimens
 import com.example.composeapp.presentation.common.theme.RecipesAppTheme
-import com.example.composeapp.presentation.recipes.components.RecipeItem
-import com.example.composeapp.presentation.recipes.mapper.toRecipeCardUiModel
-import com.example.composeapp.presentation.recipes.model.RecipeUiModel
+import com.example.composeapp.presentation.recipes.list.PreviewData.errorState
+import com.example.composeapp.presentation.recipes.list.PreviewData.successState
+import com.example.composeapp.presentation.recipes.list.model.RecipeCardUiModel
+import com.example.composeapp.presentation.recipes.list.model.RecipesUiState
 
 @Composable
 fun RecipesScreen(
-    categoryId: Int,
+    viewModel: RecipesViewModel,
     onRecipeClick: (recipeId: Int) -> Unit
 ) {
+    val recipesUiState by viewModel.recipesUiState.collectAsState()
 
-    val category = remember(categoryId) {
-        RecipesRepositoryStub.getCategories()
-            .find { it.id == categoryId }
-            ?.toDomainModel()
-    }
+    RecipesContent(
+        recipesUiState = recipesUiState,
+        onRecipeClick = onRecipeClick
+    )
+}
 
-    if (category == null) {
+@Composable
+private fun RecipesContent(
+    recipesUiState: RecipesUiState,
+    onRecipeClick: (recipeId: Int) -> Unit
+) {
+    if (recipesUiState.isError) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -53,63 +56,61 @@ fun RecipesScreen(
         return
     }
 
-    var recipes by remember(category.id) { mutableStateOf<List<RecipeUiModel>>(emptyList()) }
-
-    LaunchedEffect(category.id) {
-        recipes = getRecipesByCategoryId(category.id).map { it.toDomainModel() }.map { it.toRecipeCardUiModel() }
-    }
-
     Column {
         ScreenHeader(
-            title = category.title,
-            imageUrl = category.imageUrl,
+            title = recipesUiState.categoryTitle,
+            imageUrl = recipesUiState.categoryImageUrl,
         )
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(Dimens.paddingLarge),
             verticalArrangement = Arrangement.spacedBy(Dimens.paddingSmall)
         ) {
-            items(items = recipes) { recipe ->
+            items(items = recipesUiState.recipes) { recipe ->
                 RecipeItem(
                     imageUri = recipe.imageUrl,
                     title = recipe.title,
-                    onClick = {onRecipeClick(recipe.id)}
+                    onClick = { onRecipeClick(recipe.id) }
                 )
             }
         }
     }
 }
 
-@Preview(
-    name = "LightTheme",
-    showBackground = true,
-)
+@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "en", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun RecipesScreenLightPreview() {
+private fun RecipesContentPreview(
+    @PreviewParameter(RecipesUiStateProvider::class) state: RecipesUiState
+) {
     RecipesAppTheme {
-        RecipesScreen(categoryId = 0, onRecipeClick = {})
+        RecipesContent(recipesUiState = state, onRecipeClick = {})
     }
 }
 
-@Preview(
-    name = "DarkTheme",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
-@Composable
-fun RecipesScreenDarkPreview() {
-    RecipesAppTheme {
-        RecipesScreen(categoryId = 0, onRecipeClick = {})
-    }
+private class RecipesUiStateProvider : PreviewParameterProvider<RecipesUiState> {
+    override val values = sequenceOf(successState, errorState)
 }
 
-@Preview(
-    name = "CategoryNotFound",
-    showBackground = true,
-)
-@Composable
-fun CategoryNotFoundPreview() {
-    RecipesAppTheme {
-        RecipesScreen(categoryId = -1, onRecipeClick = {})
-    }
+private object PreviewData {
+    private val previewRecipe = RecipeCardUiModel(
+        id = 0,
+        title = "Название рецепта",
+        imageUrl = ""
+    )
+
+    val successState = RecipesUiState(
+        categoryTitle = "Категория #0",
+        categoryImageUrl = "",
+        recipes = List(10) {
+            previewRecipe.copy(
+                id = it,
+                title = "${previewRecipe.title} #$it"
+            )
+        }
+    )
+
+    val errorState = RecipesUiState(
+        isError = true
+    )
 }

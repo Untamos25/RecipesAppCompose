@@ -10,25 +10,27 @@
     <string name="title_cooking_method">Способ приготовления</string>
     <string name="portions_count">Порций: %d</string>
 
+    <string name="unit_weight">кг</string>
+
     <plurals name="unit_piece">
         <item quantity="one">штука</item>
         <item quantity="few">штуки</item>
         <item quantity="many">штук</item>
-        <item quantity="other">штуки</item>
+        <item quantity="other">штук</item>
     </plurals>
 
     <plurals name="unit_tablespoon">
         <item quantity="one">стол. ложка</item>
         <item quantity="few">стол. ложки</item>
         <item quantity="many">стол. ложек</item>
-        <item quantity="other">стол. ложки</item>
+        <item quantity="other">стол. ложек</item>
     </plurals>
 
     <plurals name="unit_clove">
         <item quantity="one">зубчик</item>
         <item quantity="few">зубчика</item>
         <item quantity="many">зубчиков</item>
-        <item quantity="other">зубчика</item>
+        <item quantity="other">зубчиков</item>
     </plurals>
 
 </resources>

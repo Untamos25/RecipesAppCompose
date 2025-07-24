@@ -2,82 +2,100 @@ package com.example.composeapp.presentation.categories
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.composeapp.R
-import com.example.composeapp.data.categories.mapper.toDomainModel
-import com.example.composeapp.data.common.source.RecipesRepositoryStub
+import com.example.composeapp.presentation.categories.PreviewData.successState
 import com.example.composeapp.presentation.categories.components.CategoryItem
-import com.example.composeapp.presentation.categories.mapper.toUiModel
-import com.example.composeapp.presentation.common.components.ScreenHeader
+import com.example.composeapp.presentation.categories.model.CategoriesUiState
 import com.example.composeapp.presentation.categories.model.CategoryUiModel
+import com.example.composeapp.presentation.common.components.ScreenHeader
 import com.example.composeapp.presentation.common.theme.Dimens
 import com.example.composeapp.presentation.common.theme.RecipesAppTheme
 
 @Composable
-fun CategoriesScreen(onCategoryClick: (category: CategoryUiModel) -> Unit) {
+fun CategoriesScreen(
+    viewModel: CategoriesViewModel,
+    onCategoryClick: (categoryId: Int) -> Unit
+) {
+    val categoriesUiState by viewModel.categoriesUiState.collectAsState()
 
-    val categories = RecipesRepositoryStub.getCategories().map { it.toDomainModel() }.map { it.toUiModel() }
+    CategoriesContent(
+        categoriesUiState = categoriesUiState,
+        onCategoryClick = onCategoryClick
+    )
+}
 
+@Composable
+private fun CategoriesContent(
+    categoriesUiState: CategoriesUiState,
+    onCategoryClick: (categoryId: Int) -> Unit
+) {
     Column {
         ScreenHeader(
             titleResId = R.string.title_categories,
             imageResId = R.drawable.img_header_categories,
         )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(Dimens.paddingLarge),
-            contentAlignment = Alignment.Center
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(Dimens.paddingLarge),
+            horizontalArrangement = Arrangement.spacedBy(Dimens.paddingLarge),
+            verticalArrangement = Arrangement.spacedBy(Dimens.paddingLarge)
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(Dimens.paddingLarge),
-                verticalArrangement = Arrangement.spacedBy(Dimens.paddingLarge)
-            ) {
-                items(items = categories) { category ->
-                    CategoryItem(
-                        imageUri = category.imageUrl,
-                        title = category.title,
-                        description = category.description,
-                        onClick = { onCategoryClick(category) }
-                    )
-                }
+            items(items = categoriesUiState.categories) { category ->
+                CategoryItem(
+                    imageUri = category.imageUrl,
+                    title = category.title,
+                    description = category.description,
+                    onClick = { onCategoryClick(category.id) }
+                )
             }
         }
     }
 }
 
-@Preview(
-    name = "LightTheme",
-    showBackground = true,
-)
+@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "en", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun CategoriesScreenLightPreview() {
+private fun CategoriesContentPreview(
+    @PreviewParameter(CategoriesUiStateProvider::class) state: CategoriesUiState
+) {
     RecipesAppTheme {
-        CategoriesScreen(onCategoryClick = {})
+        CategoriesContent(
+            onCategoryClick = {},
+            categoriesUiState = state
+        )
     }
 }
 
-@Preview(
-    name = "DarkTheme",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
-@Composable
-fun CategoriesScreenDarkPreview() {
-    RecipesAppTheme {
-        CategoriesScreen(onCategoryClick = {})
-    }
+private class CategoriesUiStateProvider : PreviewParameterProvider<CategoriesUiState> {
+    override val values = sequenceOf(successState)
+}
+
+private object PreviewData {
+    private val previewCategory = CategoryUiModel(
+        id = 0,
+        title = "Категория",
+        imageUrl = "",
+        description = "Описание категории на несколько строк"
+    )
+
+    val successState = CategoriesUiState(
+        categories = List(8) {
+            previewCategory.copy(
+                id = it,
+                title = "${previewCategory.title} #$it",
+                description = "${previewCategory.description} #$it"
+            )
+        }
+    )
 }
