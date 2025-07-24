@@ -1,10 +1,10 @@
-package com.example.composeapp.data.common.source
+package com.example.composeapp.data.repository.source
 
 import com.example.composeapp.data.categories.model.CategoryDto
 import com.example.composeapp.data.recipes.model.IngredientDto
 import com.example.composeapp.data.recipes.model.RecipeDto
 
-object RecipesRepositoryStub {
+object AppRepositoryStub {
     private val categories = listOf(
         CategoryDto(
             id = 0,
@@ -91,6 +91,10 @@ object RecipesRepositoryStub {
     )
 
     fun getCategories(): List<CategoryDto> = categories
+
+    fun getCategoryById(categoryId: Int): CategoryDto? {
+        return categories.find { it.id == categoryId }
+    }
 
     fun getRecipesByCategoryId(categoryId: Int): List<RecipeDto> {
         return when (categoryId) {

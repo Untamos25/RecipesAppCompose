@@ -1,16 +1,13 @@
-package com.example.composeapp.presentation.recipes.model
+package com.example.composeapp.presentation.recipes.detail.model
 
-import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.parcelize.Parcelize
 
 @Immutable
-@Parcelize
-data class RecipeUiModel(
+data class RecipeDetailsUiModel(
     val id: Int,
     val title: String,
     val ingredients: ImmutableList<IngredientUiModel>,
     val method: ImmutableList<String>,
     val imageUrl: String
-) : Parcelable
+)

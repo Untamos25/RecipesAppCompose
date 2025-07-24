@@ -1,4 +1,4 @@
-package com.example.composeapp.presentation.recipes.components
+package com.example.composeapp.presentation.common.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -65,21 +65,10 @@ fun RecipeItem(
     }
 }
 
-@Preview(name = "LightTheme")
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun RecipeItemLightPreview() {
-    RecipesAppTheme {
-        RecipeItem(
-            imageUri = "",
-            title = "Заголовок",
-            onClick = {}
-        )
-    }
-}
-
-@Preview(name = "DarkTheme", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun RecipeItemDarkPreview() {
+private fun RecipeItemPreview() {
     RecipesAppTheme {
         RecipeItem(
             imageUri = "",

@@ -1,11 +1,10 @@
-package com.example.composeapp.presentation.categories.model
+package com.example.composeapp.presentation.recipes.list.model
 
 import androidx.compose.runtime.Immutable
 
 @Immutable
-data class CategoryUiModel(
+data class RecipeCardUiModel(
     val id: Int,
     val title: String,
-    val description: String,
     val imageUrl: String
 )

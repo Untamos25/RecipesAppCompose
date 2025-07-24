@@ -80,22 +80,10 @@ fun CategoryItem(
     }
 }
 
-@Preview(name = "LightTheme")
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun CategoryItemLightPreview() {
-    RecipesAppTheme {
-        CategoryItem(
-            imageUri = "",
-            title = "Заголовок",
-            description = "Описание на несколько строк на карточке",
-            onClick = {}
-        )
-    }
-}
-
-@Preview(name = "DarkTheme", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun CategoryItemDarkPreview() {
+private fun CategoryItemPreview() {
     RecipesAppTheme {
         CategoryItem(
             imageUri = "",

@@ -52,35 +52,18 @@ fun FavoritesScreen(
 }
 
 
-@Preview(
-    name = "LightTheme",
-    showBackground = true,
-)
+@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "en", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun FavoritesScreenLightPreview() {
+private fun FavoritesScreenPreview() {
     RecipesAppTheme {
         FavoritesScreen()
     }
 }
 
-@Preview(
-    name = "DarkTheme",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
+@Preview(showBackground = true)
 @Composable
-fun FavoritesScreenDarkPreview() {
-    RecipesAppTheme {
-        FavoritesScreen()
-    }
-}
-
-@Preview(
-    name = "LightTheme - With Content",
-    showBackground = true,
-)
-@Composable
-fun FavoritesScreenWithContentPreview() {
+private fun FavoritesScreenWithContentPreview() {
     RecipesAppTheme {
         FavoritesScreen(recipes = listOf(1))
     }
