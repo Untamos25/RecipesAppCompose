@@ -13,6 +13,7 @@ object Dimens {
 
     // Размеры
     val iconSizeMedium = 24.dp
+    val iconSizeLarge = 40.dp
     val headerImageSize = 224.dp
     val dividerThickness = 1.dp
 

@@ -7,7 +7,8 @@ import kotlinx.collections.immutable.ImmutableList
 data class RecipeDetailsUiModel(
     val id: Int,
     val title: String,
+    val imageUrl: String,
     val ingredients: ImmutableList<IngredientUiModel>,
     val method: ImmutableList<String>,
-    val imageUrl: String
+    val isFavorite: Boolean
 )

@@ -5,6 +5,7 @@ sealed class Destination(val route: String) {
     companion object {
         const val CATEGORY_ID = "categoryId"
         const val RECIPE_ID = "recipeId"
+        const val INVALID_ID = -1
     }
 
     data object Categories : Destination("categories")

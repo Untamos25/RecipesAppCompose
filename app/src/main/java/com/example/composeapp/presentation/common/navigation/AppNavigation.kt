@@ -15,7 +15,7 @@ import com.example.composeapp.presentation.common.navigation.Destination.Compani
 import com.example.composeapp.presentation.common.navigation.Destination.Companion.RECIPE_ID
 import com.example.composeapp.presentation.favorites.FavoritesScreen
 import com.example.composeapp.presentation.recipes.detail.RecipeDetailsScreen
-import com.example.composeapp.presentation.recipes.list.RecipesScreen
+import com.example.composeapp.presentation.recipes.list.RecipesListScreen
 
 @Composable
 fun AppNavigation(
@@ -30,7 +30,11 @@ fun AppNavigation(
             startDestination = Destination.Categories.route
         ) {
             composable(route = Destination.Favorites.route) {
-                FavoritesScreen()
+                FavoritesScreen(
+                    viewModel = hiltViewModel(),
+                    onRecipeClick = {recipeId ->
+                        navController.navigate(Destination.RecipeDetail.createRoute(recipeId))
+                    })
             }
 
             composable(route = Destination.Categories.route) {
@@ -46,7 +50,7 @@ fun AppNavigation(
                 route = Destination.Recipes.route,
                 arguments = listOf(navArgument(CATEGORY_ID) { type = NavType.IntType })
             ) {
-                RecipesScreen(
+                RecipesListScreen(
                     viewModel = hiltViewModel(),
                     onRecipeClick = { recipeId ->
                         navController.navigate(Destination.RecipeDetail.createRoute(recipeId))
