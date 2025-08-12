@@ -2,7 +2,9 @@ package com.example.composeapp.presentation.recipes.detail
 
 import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +50,7 @@ import com.example.composeapp.presentation.common.theme.RecipesAppTheme
 import com.example.composeapp.presentation.recipes.detail.PreviewData.errorState
 import com.example.composeapp.presentation.recipes.detail.PreviewData.successState
 import com.example.composeapp.presentation.recipes.detail.formatter.IngredientFormatter
+import com.example.composeapp.presentation.recipes.detail.formatter.QuantityFormatter
 import com.example.composeapp.presentation.recipes.detail.model.IngredientUiModel
 import com.example.composeapp.presentation.recipes.detail.model.RecipeDetailsUiModel
 import com.example.composeapp.presentation.recipes.detail.model.RecipeDetailsUiState
@@ -54,21 +58,26 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun RecipeDetailsScreen(
-    viewModel: RecipesDetailViewModel,
+    viewModel: RecipeDetailViewModel,
 ) {
     val recipeDetailsUiState by viewModel.recipeDetailsUiState.collectAsState()
 
     RecipeDetailsContent(
         recipeDetailsUiState = recipeDetailsUiState,
-        onSliderChange = viewModel::onPortionsChanged
+        onSliderChange = viewModel::onPortionsChanged,
+        onFavoriteClick = viewModel::onFavoriteClick
     )
 }
 
 @Composable
 private fun RecipeDetailsContent(
     recipeDetailsUiState: RecipeDetailsUiState,
-    onSliderChange: (Float) -> Unit
+    onSliderChange: (Float) -> Unit,
+    onFavoriteClick: () -> Unit
 ) {
+
+    val recipe = recipeDetailsUiState.recipe
+
     if (recipeDetailsUiState.isError || recipeDetailsUiState.recipe == null) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -80,11 +89,27 @@ private fun RecipeDetailsContent(
         return
     }
 
+    val heartIcon =
+        if (recipe.isFavorite) R.drawable.ic_heart else R.drawable.ic_heart_empty
+
     Column {
-        ScreenHeader(
-            title = recipeDetailsUiState.recipe.title,
-            imageUrl = recipeDetailsUiState.recipe.imageUrl
-        )
+        Box {
+            ScreenHeader(
+                title = recipeDetailsUiState.recipe.title,
+                imageUrl = recipeDetailsUiState.recipe.imageUrl
+            )
+            Image(
+                painter = painterResource(heartIcon),
+                contentDescription = "",
+                modifier = Modifier
+                    .align(alignment = Alignment.TopEnd)
+                    .padding(Dimens.paddingLarge)
+                    .size(Dimens.iconSizeLarge)
+                    .clickable(onClick = onFavoriteClick)
+
+            )
+        }
+
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
@@ -106,7 +131,7 @@ private fun RecipeDetailsContent(
             )
 
             IngredientsList(
-                ingredients = recipeDetailsUiState.calculatedIngredients
+                ingredients = recipe.ingredients
             )
 
             Text(
@@ -216,9 +241,10 @@ private fun IngredientItem(ingredient: IngredientUiModel) {
         )
 
         val unitText = IngredientFormatter.formatUnitOfMeasure(ingredient)
+        val formattedQuantity = QuantityFormatter.format(ingredient.quantity)
 
         Text(
-            text = "${ingredient.quantity} $unitText".uppercase(),
+            text = "$formattedQuantity $unitText".uppercase(),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSecondary,
             textAlign = TextAlign.End,
@@ -267,7 +293,8 @@ private fun RecipeDetailsContentPreview(
     RecipesAppTheme {
         RecipeDetailsContent(
             recipeDetailsUiState = state,
-            onSliderChange = {}
+            onSliderChange = {},
+            onFavoriteClick = {}
         )
     }
 }
@@ -290,13 +317,13 @@ private object PreviewData {
             "1. Первый шаг приготовления",
             "2. Второй шаг приготовления весьма продолжительный, что занимает несколько строк",
             "3. Третий шаг приготовления",
-        )
+        ),
+        isFavorite = true
     )
 
     val successState = RecipeDetailsUiState(
         recipe = previewRecipe,
-        portionsCount = 3f,
-        calculatedIngredients = previewRecipe.ingredients
+        portionsCount = 3f
     )
 
     val errorState = RecipeDetailsUiState(

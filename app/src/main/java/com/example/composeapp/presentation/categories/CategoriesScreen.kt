@@ -4,16 +4,22 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.composeapp.R
+import com.example.composeapp.presentation.categories.PreviewData.errorState
 import com.example.composeapp.presentation.categories.PreviewData.successState
 import com.example.composeapp.presentation.categories.components.CategoryItem
 import com.example.composeapp.presentation.categories.model.CategoriesUiState
@@ -21,6 +27,7 @@ import com.example.composeapp.presentation.categories.model.CategoryUiModel
 import com.example.composeapp.presentation.common.components.ScreenHeader
 import com.example.composeapp.presentation.common.theme.Dimens
 import com.example.composeapp.presentation.common.theme.RecipesAppTheme
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun CategoriesScreen(
@@ -45,6 +52,18 @@ private fun CategoriesContent(
             titleResId = R.string.title_categories,
             imageResId = R.drawable.img_header_categories,
         )
+
+        if (categoriesUiState.isError) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(stringResource(R.string.title_categories_not_found))
+            }
+            return
+        }
+
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(Dimens.paddingLarge),
@@ -78,7 +97,7 @@ private fun CategoriesContentPreview(
 }
 
 private class CategoriesUiStateProvider : PreviewParameterProvider<CategoriesUiState> {
-    override val values = sequenceOf(successState)
+    override val values = sequenceOf(successState, errorState)
 }
 
 private object PreviewData {
@@ -96,6 +115,10 @@ private object PreviewData {
                 title = "${previewCategory.title} #$it",
                 description = "${previewCategory.description} #$it"
             )
-        }
+        }.toImmutableList()
+    )
+
+    val errorState = CategoriesUiState(
+        isError = true
     )
 }

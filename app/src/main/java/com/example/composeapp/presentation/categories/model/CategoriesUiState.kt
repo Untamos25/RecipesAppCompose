@@ -1,5 +1,9 @@
 package com.example.composeapp.presentation.categories.model
 
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+
 data class CategoriesUiState(
-    val categories: List<CategoryUiModel> = emptyList()
+    val categories: ImmutableList<CategoryUiModel> = persistentListOf(),
+    val isError: Boolean = false
 )
