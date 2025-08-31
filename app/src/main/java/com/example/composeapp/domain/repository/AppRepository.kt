@@ -14,5 +14,7 @@ interface AppRepository {
     fun getFavoriteRecipes(): Flow<List<Recipe>>
 
     suspend fun updateFavoriteStatus(recipeId: Int, isFavorite: Boolean)
-    suspend fun refreshData()
+    suspend fun syncCategories()
+    suspend fun syncRecipesForCategory(categoryId: Int)
+    suspend fun syncRecipeDetails(recipeId: Int)
 }

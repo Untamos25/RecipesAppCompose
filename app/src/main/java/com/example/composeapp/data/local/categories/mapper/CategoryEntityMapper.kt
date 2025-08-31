@@ -7,5 +7,6 @@ fun CategoryEntity.toDomain() = Category(
     id = id,
     title = title,
     description = description,
-    imageUrl = imageUrl
+    imageUrl = imageUrl,
+    lastSyncTime = lastSyncTime
 )

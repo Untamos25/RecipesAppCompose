@@ -3,6 +3,7 @@ package com.example.composeapp.data.remote.source
 import com.example.composeapp.data.remote.categories.model.CategoryDto
 import com.example.composeapp.data.remote.recipes.model.IngredientDto
 import com.example.composeapp.data.remote.recipes.model.RecipeDto
+import kotlin.random.Random
 
 object RemoteDataSourceStub : RemoteDataSource {
     private val categories = listOf(
@@ -45,6 +46,7 @@ object RemoteDataSourceStub : RemoteDataSource {
     )
 
     private val recipes = listOf(
+        // Бургеры
         RecipeDto(
             id = 0,
             title = "Классический бургер с говядиной",
@@ -172,27 +174,88 @@ object RemoteDataSourceStub : RemoteDataSource {
                 "5. Подавайте чизбургеры немедленно, пока они горячие, с картофелем фри или вашим любимым гарниром."
             ),
             imageUrl = "burger-cheeseburger.png"
+        ),
+        // Пицца
+        RecipeDto(
+            id = 2,
+            title = "Пицца Маргарита",
+            ingredients = listOf(
+                IngredientDto(quantity = "1", unitOfMeasure = "шт", description = "основа для пиццы"),
+                IngredientDto(quantity = "150", unitOfMeasure = "г", description = "томатный соус"),
+                IngredientDto(quantity = "200", unitOfMeasure = "г", description = "моцарелла, нарезанная"),
+                IngredientDto(quantity = "1", unitOfMeasure = "пучок", description = "свежий базилик"),
+                IngredientDto(quantity = "2", unitOfMeasure = "ст. л.", description = "оливковое масло"),
+                IngredientDto(quantity = "по вкусу", unitOfMeasure = "", description = "соль")
+            ),
+            method = listOf(
+                "1. Разогрейте духовку до 250°C. Поместите камень для пиццы или противень в духовку, чтобы он нагрелся.",
+                "2. Аккуратно раскатайте тесто для пиццы на присыпанной мукой поверхности до желаемой толщины.",
+                "3. Равномерно распределите томатный соус по тесту, оставляя небольшой бортик по краям.",
+                "4. Разложите ломтики моцареллы поверх соуса.",
+                "5. Аккуратно перенесите пиццу на разогретый камень или противень. Выпекайте 10-12 минут, пока корочка не станет золотистой, а сыр не расплавится и не за пузырится.",
+                "6. Достаньте пиццу из духовки, украсьте свежими листьями базилика, сбрызните оливковым маслом и посолите. Дайте немного остыть перед нарезкой."
+            ),
+            imageUrl = "burger_classic.png"
+        ),
+        RecipeDto(
+            id = 3,
+            title = "Пицца Пепперони",
+            ingredients = listOf(
+                IngredientDto(quantity = "1", unitOfMeasure = "шт", description = "основа для пиццы"),
+                IngredientDto(quantity = "150", unitOfMeasure = "г", description = "томатный соус для пиццы"),
+                IngredientDto(quantity = "250", unitOfMeasure = "г", description = "моцарелла, тертая"),
+                IngredientDto(quantity = "100", unitOfMeasure = "г", description = "пепперони, нарезанная тонкими ломтиками"),
+                IngredientDto(quantity = "1", unitOfMeasure = "ч. л.", description = "сушеный орегано")
+            ),
+            method = listOf(
+                "1. Предварительно разогрейте духовку до 220°C.",
+                "2. Раскатайте тесто для пиццы и выложите его на смазанный маслом противень или пергаментную бумагу.",
+                "3. Равномерно нанесите томатный соус на тесто, оставляя края свободными.",
+                "4. Посыпьте сверху половиной тертой моцареллы.",
+                "5. Выложите ломтики пепперони на сыр.",
+                "6. Посыпьте оставшейся моцареллой и сушеным орегано.",
+                "7. Выпекайте в разогретой духовке 15-20 минут, до тех пор, пока корочка не станет золотистой, а сыр полностью не расплавится.",
+                "8. Подавайте горячей."
+            ),
+            imageUrl = "burger-cheeseburger.png"
         )
     )
 
-    override fun getCategories(): List<CategoryDto> = categories
+
+    override fun getCategories(): List<CategoryDto> {
+        Thread.sleep(2000L)
+        val suffix = getTestSuffix()
+        return categories.map { it.copy(title = it.title + suffix) }
+    }
 
     override fun getCategoryById(categoryId: Int): CategoryDto? {
-        return categories.find { it.id == categoryId }
+        val suffix = getTestSuffix()
+        return categories.find { it.id == categoryId }?.copy(title = "Категория$suffix")
     }
 
     override fun getRecipesByCategoryId(categoryId: Int): List<RecipeDto> {
-        return when (categoryId) {
-            0 -> recipes
+        Thread.sleep(2000L)
+        val suffix = getTestSuffix()
+        val recipesToModify = when (categoryId) {
+            0 -> recipes.filter { it.id == 0 || it.id == 1 }
+            2 -> recipes.filter { it.id == 2 || it.id == 3 }
             else -> emptyList()
         }
+        return recipesToModify.map { it.copy(title = it.title + suffix) }
     }
 
     override fun getRecipeById(recipeId: Int): RecipeDto? {
-        return recipes.find { it.id == recipeId }
+        Thread.sleep(3000L)
+        val suffix = getTestSuffix()
+        return recipes.find { it.id == recipeId }?.copy(title = "Рецепт" + suffix)
     }
 
     override fun getRecipesByIds(recipeIds: List<Int>): List<RecipeDto> {
-        return recipes
+        val suffix = getTestSuffix()
+        return recipes.filter { it.id in recipeIds }.map { it.copy(title = it.title + suffix) }
+    }
+
+    private fun getTestSuffix(): String {
+        return " #${Random.nextInt(0, 99)}"
     }
 }

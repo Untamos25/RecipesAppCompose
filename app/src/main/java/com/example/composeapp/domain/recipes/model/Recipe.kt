@@ -6,5 +6,6 @@ data class Recipe(
     val title: String,
     val method: List<String>,
     val imageUrl: String,
-    val isFavorite: Boolean
+    val isFavorite: Boolean,
+    val lastSyncTime: Long
 )

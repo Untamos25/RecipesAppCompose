@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,6 +26,7 @@ import com.example.composeapp.presentation.common.components.ScreenHeader
 import com.example.composeapp.presentation.common.theme.Dimens
 import com.example.composeapp.presentation.common.theme.RecipesAppTheme
 import com.example.composeapp.presentation.recipes.list.PreviewData.errorState
+import com.example.composeapp.presentation.recipes.list.PreviewData.loadingState
 import com.example.composeapp.presentation.recipes.list.PreviewData.successState
 import com.example.composeapp.presentation.recipes.list.model.RecipeCardUiModel
 import com.example.composeapp.presentation.recipes.list.model.RecipesListUiState
@@ -37,42 +41,68 @@ fun RecipesListScreen(
 
     RecipesListContent(
         recipesListUiState = recipesListUiState,
-        onRecipeClick = onRecipeClick
+        onRecipeClick = onRecipeClick,
+        onRefresh = viewModel::onRefresh
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RecipesListContent(
     recipesListUiState: RecipesListUiState,
-    onRecipeClick: (recipeId: Int) -> Unit
+    onRecipeClick: (recipeId: Int) -> Unit,
+    onRefresh: () -> Unit
 ) {
-    if (recipesListUiState.isError) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(stringResource(R.string.title_category_not_found))
-        }
-        return
-    }
+    Column(modifier = Modifier.fillMaxSize()) {
 
-    Column {
-        ScreenHeader(
-            title = recipesListUiState.categoryTitle,
-            imageUrl = recipesListUiState.categoryImageUrl,
-        )
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(Dimens.paddingLarge),
-            verticalArrangement = Arrangement.spacedBy(Dimens.paddingSmall)
+        if (!recipesListUiState.isError && !recipesListUiState.isLoading) {
+            ScreenHeader(
+                title = recipesListUiState.categoryTitle,
+                imageUrl = recipesListUiState.categoryImageUrl,
+            )
+        }
+
+        PullToRefreshBox(
+            isRefreshing = recipesListUiState.isRefreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier.fillMaxSize()
         ) {
-            items(items = recipesListUiState.recipes) { recipe ->
-                RecipeItem(
-                    imageUri = recipe.imageUrl,
-                    title = recipe.title,
-                    onClick = { onRecipeClick(recipe.id) }
-                )
+            when {
+                recipesListUiState.isLoading -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                recipesListUiState.isError -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(stringResource(R.string.title_category_not_found))
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(Dimens.paddingLarge),
+                        verticalArrangement = Arrangement.spacedBy(Dimens.paddingSmall)
+                    ) {
+                        items(items = recipesListUiState.recipes) { recipe ->
+                            RecipeItem(
+                                imageUri = recipe.imageUrl,
+                                title = recipe.title,
+                                onClick = { onRecipeClick(recipe.id) }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -85,12 +115,16 @@ private fun RecipesContentPreview(
     @PreviewParameter(RecipesListUiStateProvider::class) state: RecipesListUiState
 ) {
     RecipesAppTheme {
-        RecipesListContent(recipesListUiState = state, onRecipeClick = {})
+        RecipesListContent(
+            recipesListUiState = state,
+            onRecipeClick = {},
+            onRefresh = {}
+        )
     }
 }
 
 private class RecipesListUiStateProvider : PreviewParameterProvider<RecipesListUiState> {
-    override val values = sequenceOf(successState, errorState)
+    override val values = sequenceOf(successState, errorState, loadingState)
 }
 
 private object PreviewData {
@@ -108,10 +142,16 @@ private object PreviewData {
                 id = it,
                 title = "${previewRecipe.title} #$it"
             )
-        }.toImmutableList()
+        }.toImmutableList(),
+        isLoading = false
     )
 
     val errorState = RecipesListUiState(
-        isError = true
+        isError = true,
+        isLoading = false
+    )
+
+    val loadingState = RecipesListUiState(
+        isLoading = true
     )
 }

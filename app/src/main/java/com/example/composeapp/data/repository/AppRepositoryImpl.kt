@@ -13,13 +13,9 @@ import com.example.composeapp.domain.recipes.model.Recipe
 import com.example.composeapp.domain.recipes.model.RecipeWithIngredients
 import com.example.composeapp.domain.repository.AppRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -53,80 +49,92 @@ class AppRepositoryImpl @Inject constructor(
         recipeDao.updateFavoriteStatus(recipeId, isFavorite)
     }
 
-
-    override suspend fun refreshData() = withContext(Dispatchers.IO) {
-        val favoriteRecipeIds = recipeDao.getFavoriteRecipes().first().map { it.id }.toSet()
-        val categoriesDto = remoteDataSource.getCategories()
-        val semaphore = Semaphore(5)
-
-        val recipesByCategories = categoriesDto.map { categoryDto ->
-            async {
-                semaphore.withPermit {
-                    categoryDto to remoteDataSource.getRecipesByCategoryId(categoryDto.id)
-                }
-            }
-        }.awaitAll()
-
-        val allRecipes = recipesByCategories.flatMap { (categoryDto, recipesDtoList) ->
-            recipesDtoList.map { recipeDto ->
-                recipeDto.toEntity(categoryId = categoryDto.id)
-                    .copy(isFavorite = favoriteRecipeIds.contains(recipeDto.id))
-            }
+    override suspend fun syncCategories() = withContext(Dispatchers.IO) {
+        val categoriesDtoFromServer = remoteDataSource.getCategories()
+        val categoriesDtoFromServerIds = categoriesDtoFromServer.map { it.id }.toSet()
+        val categoriesEntitiesFromServer = categoriesDtoFromServer.map { categoryDto ->
+            categoryDto.toEntity().copy(lastSyncTime = System.currentTimeMillis())
         }
 
-        val allIngredients = recipesByCategories.flatMap { (_, recipesDtoList) ->
-            recipesDtoList.flatMap { recipeDto ->
-                recipeDto.ingredients.map { ingredientDto ->
-                    ingredientDto.toEntity(recipeId = recipeDto.id)
-                }
-            }
+        val categoriesFromDb = categoryDao.getCategories().first()
+        val categoriesFromDbIds = categoriesFromDb.map {it.id}.toSet()
+
+        val categoriesToDelete = categoriesFromDbIds - categoriesDtoFromServerIds
+        if (categoriesToDelete.isNotEmpty()) {
+            categoryDao.deleteCategoriesByIds(categoriesToDelete.toList())
         }
 
-        val allCategories = categoriesDto.map { it.toEntity() }
+        val categoriesToUpdate = categoriesEntitiesFromServer.filter { it.id in categoriesFromDbIds }
+        if (categoriesToUpdate.isNotEmpty()) {
+            categoryDao.updateCategories(categoriesToUpdate)
+        }
 
-        categoryDao.updateAllData(
-            recipeDao = recipeDao,
-            categories = allCategories,
-            recipes = allRecipes,
-            ingredients = allIngredients
-        )
+        val categoriesToInsert = categoriesEntitiesFromServer.filter { it.id !in categoriesFromDbIds }
+        if (categoriesToInsert.isNotEmpty()) {
+            categoryDao.insertCategories(categoriesToInsert)
+        }
     }
 
+    override suspend fun syncRecipesForCategory(categoryId: Int) = withContext(Dispatchers.IO) {
+        val recipesDtoFromServer = remoteDataSource.getRecipesByCategoryId(categoryId)
+        val recipesDtoFromServerIds = recipesDtoFromServer.map { it.id }.toSet()
 
-//    override suspend fun refreshData() {
-//        withContext(Dispatchers.IO) {
-//            val favoriteRecipeIds = recipeDao.getFavoriteRecipes().first().map { it.id }.toSet()
-//
-//            val categoriesDto = remoteDataSource.getCategories()
-//
-//            val allRecipes = mutableListOf<RecipeEntity>()
-//            val allIngredients = mutableListOf<IngredientEntity>()
-//
-//            categoriesDto.forEach { categoryDto ->
-//                val recipesDto = remoteDataSource.getRecipesByCategoryId(categoryDto.id)
-//
-//                allRecipes += recipesDto.map { recipeDto ->
-//                    recipeDto.toEntity(categoryId = categoryDto.id)
-//                        .copy(isFavorite = favoriteRecipeIds.contains(recipeDto.id))
-//                }
-//
-//                allIngredients += recipesDto.flatMap { recipeDto ->
-//                    recipeDto.ingredients.map { ingredientDto ->
-//                        ingredientDto.toEntity(recipeId = recipeDto.id)
-//                    }
-//                }
-//            }
-//
-//            val allCategories = categoriesDto.map { it.toEntity() }
-//
-//            categoryDao.updateAllData(
-//                recipeDao = recipeDao,
-//                categories = allCategories,
-//                recipes = allRecipes,
-//                ingredients = allIngredients
-//            )
-//        }
-//    }
+        val recipesFromDb =
+            categoryDao.getCategoryWithRecipes(categoryId).first()?.recipeEntities ?: emptyList()
+        val recipesFromDbIds = recipesFromDb.map { it.id }.toSet()
+        val favoritesRecipes = recipesFromDb.filter { it.isFavorite }.map { it.id }.toSet()
 
+        val recipesIdsToDeleteFromDb = recipesFromDbIds - recipesDtoFromServerIds
+        if (recipesIdsToDeleteFromDb.isNotEmpty()) {
+            recipeDao.deleteRecipesByIds(recipesIdsToDeleteFromDb.toList())
+        }
 
+        val recipeEntitiesWithCurrentFavoriteStatus = recipesDtoFromServer.map { recipeDto ->
+            val isFavorite = favoritesRecipes.contains(recipeDto.id)
+
+            recipeDto.toEntity(categoryId = categoryId).copy(
+                isFavorite = isFavorite,
+                lastSyncTime = System.currentTimeMillis())
+        }
+
+        val allIngredientEntities = recipesDtoFromServer.flatMap { recipeDto ->
+            recipeDto.ingredients.mapIndexed { index, ingredientDto ->
+                ingredientDto.toEntity(recipeId = recipeDto.id, index = index)
+            }
+        }
+
+        recipeDao.replaceRecipesAndIngredients(
+            recipeEntitiesWithCurrentFavoriteStatus,
+            allIngredientEntities
+        )
+
+        categoryDao.updateCategorySyncTime(categoryId, System.currentTimeMillis())
+    }
+
+    override suspend fun syncRecipeDetails(recipeId: Int) = withContext(Dispatchers.IO) {
+        try {
+            val recipeDtoFormServer = remoteDataSource.getRecipeById(recipeId) ?: return@withContext
+
+            val recipeEntityFromDb =
+                recipeDao.getRecipeWithIngredients(recipeId).first()?.recipeEntity
+                    ?: return@withContext
+
+            val updatedRecipeEntity = recipeEntityFromDb.copy(
+                title = recipeDtoFormServer.title,
+                method = recipeDtoFormServer.method,
+                imageUrl = recipeDtoFormServer.imageUrl,
+                lastSyncTime = System.currentTimeMillis()
+            )
+            recipeDao.upsertRecipes(listOf(updatedRecipeEntity))
+
+            val ingredientEntities =
+                recipeDtoFormServer.ingredients.mapIndexed { index, ingredientDto ->
+                    ingredientDto.toEntity(recipeId = recipeDtoFormServer.id, index = index)
+                }
+            recipeDao.replaceIngredientsForRecipe(recipeId, ingredientEntities)
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }

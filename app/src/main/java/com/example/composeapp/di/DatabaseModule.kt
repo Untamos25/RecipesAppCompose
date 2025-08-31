@@ -5,8 +5,6 @@ import androidx.room.Room
 import com.example.composeapp.data.local.AppDatabase
 import com.example.composeapp.data.local.categories.dao.CategoryDao
 import com.example.composeapp.data.local.recipes.dao.RecipeDao
-import com.example.composeapp.data.remote.source.RemoteDataSource
-import com.example.composeapp.data.remote.source.RemoteDataSourceStub
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,11 +36,5 @@ object DatabaseModule {
     @Singleton
     fun provideRecipeDao(database: AppDatabase): RecipeDao {
         return database.recipeDao()
-    }
-
-    @Provides
-    @Singleton
-    fun provideRemoteDataSource(): RemoteDataSource {
-        return RemoteDataSourceStub
     }
 }
