@@ -9,5 +9,6 @@ fun RecipeEntity.toDomain() = Recipe(
     title = title,
     method = method,
     imageUrl = imageUrl,
-    isFavorite = isFavorite
+    isFavorite = isFavorite,
+    lastSyncTime = lastSyncTime
 )

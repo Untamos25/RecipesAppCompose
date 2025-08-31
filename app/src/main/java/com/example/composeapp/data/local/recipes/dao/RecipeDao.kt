@@ -28,4 +28,31 @@ interface RecipeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertIngredients(ingredients: List<IngredientEntity>)
+
+    @Query("DELETE FROM ingredients WHERE recipeId = :recipeId")
+    suspend fun clearIngredientsForRecipe(recipeId: Int)
+
+    @Query("DELETE FROM recipes WHERE id IN (:recipeIds)")
+    suspend fun deleteRecipesByIds(recipeIds: List<Int>)
+
+    @Transaction
+    suspend fun replaceIngredientsForRecipe(recipeId: Int, ingredients: List<IngredientEntity>) {
+        clearIngredientsForRecipe(recipeId)
+        upsertIngredients(ingredients)
+    }
+
+    @Transaction
+    suspend fun replaceRecipesAndIngredients(
+        recipes: List<RecipeEntity>,
+        ingredients: List<IngredientEntity>
+    ) {
+        upsertRecipes(recipes)
+
+        val recipeIds = recipes.map { it.id }
+        clearIngredientsForRecipes(recipeIds)
+        if (ingredients.isNotEmpty()) upsertIngredients(ingredients)
+    }
+
+    @Query("DELETE FROM ingredients WHERE recipeId IN (:recipeIds)")
+    suspend fun clearIngredientsForRecipes(recipeIds: List<Int>)
 }

@@ -19,11 +19,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -48,6 +50,7 @@ import com.example.composeapp.presentation.common.constants.SliderConstants.SLID
 import com.example.composeapp.presentation.common.theme.Dimens
 import com.example.composeapp.presentation.common.theme.RecipesAppTheme
 import com.example.composeapp.presentation.recipes.detail.PreviewData.errorState
+import com.example.composeapp.presentation.recipes.detail.PreviewData.loadingState
 import com.example.composeapp.presentation.recipes.detail.PreviewData.successState
 import com.example.composeapp.presentation.recipes.detail.formatter.IngredientFormatter
 import com.example.composeapp.presentation.recipes.detail.formatter.QuantityFormatter
@@ -64,89 +67,113 @@ fun RecipeDetailsScreen(
 
     RecipeDetailsContent(
         recipeDetailsUiState = recipeDetailsUiState,
-        onSliderChange = viewModel::onPortionsChanged,
-        onFavoriteClick = viewModel::onFavoriteClick
+        onSliderChange = viewModel::onPortionsChange,
+        onFavoriteClick = viewModel::onFavoriteClick,
+        onRefresh = viewModel::onRefresh
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RecipeDetailsContent(
     recipeDetailsUiState: RecipeDetailsUiState,
     onSliderChange: (Float) -> Unit,
-    onFavoriteClick: () -> Unit
+    onFavoriteClick: () -> Unit,
+    onRefresh: () -> Unit
 ) {
 
     val recipe = recipeDetailsUiState.recipe
 
-    if (recipeDetailsUiState.isError || recipeDetailsUiState.recipe == null) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(stringResource(R.string.title_recipe_not_found))
-        }
-        return
-    }
+    Column(modifier = Modifier.fillMaxSize()) {
 
-    val heartIcon =
-        if (recipe.isFavorite) R.drawable.ic_heart else R.drawable.ic_heart_empty
-
-    Column {
         Box {
-            ScreenHeader(
-                title = recipeDetailsUiState.recipe.title,
-                imageUrl = recipeDetailsUiState.recipe.imageUrl
-            )
-            Image(
-                painter = painterResource(heartIcon),
-                contentDescription = "",
-                modifier = Modifier
-                    .align(alignment = Alignment.TopEnd)
-                    .padding(Dimens.paddingLarge)
-                    .size(Dimens.iconSizeLarge)
-                    .clickable(onClick = onFavoriteClick)
+            if (recipe != null && !recipeDetailsUiState.isError && !recipeDetailsUiState.isLoading) {
+                ScreenHeader(
+                    title = recipe.title,
+                    imageUrl = recipe.imageUrl
+                )
 
-            )
+                val heartIcon =
+                    if (recipe.isFavorite) R.drawable.ic_heart else R.drawable.ic_heart_empty
+                Image(
+                    painter = painterResource(heartIcon),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopEnd)
+                        .padding(Dimens.paddingLarge)
+                        .size(Dimens.iconSizeLarge)
+                        .clickable(onClick = onFavoriteClick)
+                )
+            }
         }
 
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = Dimens.paddingLarge)
+        PullToRefreshBox(
+            isRefreshing = recipeDetailsUiState.isRefreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = stringResource(R.string.title_ingredients).uppercase(),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.displayLarge,
-                modifier = Modifier.padding(
-                    top = Dimens.paddingLarge,
-                    bottom = Dimens.paddingExtraSmall
-                )
-            )
+            when {
+                recipeDetailsUiState.isLoading -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
 
-            PortionsSelector(
-                portionsCount = recipeDetailsUiState.portionsCount,
-                onValueChange = onSliderChange
-            )
+                recipeDetailsUiState.isError || recipe == null -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(stringResource(R.string.title_recipe_not_found))
+                    }
+                }
 
-            IngredientsList(
-                ingredients = recipe.ingredients
-            )
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = Dimens.paddingLarge)
+                            .verticalScroll(rememberScrollState()),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.title_ingredients).uppercase(),
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.displayLarge,
+                            modifier = Modifier.padding(
+                                top = Dimens.paddingLarge,
+                                bottom = Dimens.paddingExtraSmall
+                            )
+                        )
 
-            Text(
-                text = stringResource(R.string.title_cooking_method).uppercase(),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.displayLarge,
-                modifier = Modifier.padding(vertical = Dimens.paddingLarge)
-            )
+                        PortionsSelector(
+                            portionsCount = recipeDetailsUiState.portionsCount,
+                            onValueChange = onSliderChange
+                        )
 
-            CookingMethodBlock(
-                steps = recipeDetailsUiState.recipe.method
-            )
+                        IngredientsList(
+                            ingredients = recipe.ingredients
+                        )
+
+                        Text(
+                            text = stringResource(R.string.title_cooking_method).uppercase(),
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.displayLarge,
+                            modifier = Modifier.padding(vertical = Dimens.paddingLarge)
+                        )
+
+                        CookingMethodBlock(
+                            steps = recipe.method
+                        )
+                    }
+                }
+            }
         }
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -294,13 +321,14 @@ private fun RecipeDetailsContentPreview(
         RecipeDetailsContent(
             recipeDetailsUiState = state,
             onSliderChange = {},
-            onFavoriteClick = {}
+            onFavoriteClick = {},
+            onRefresh = {}
         )
     }
 }
 
 private class RecipeDetailsUiStateProvider : PreviewParameterProvider<RecipeDetailsUiState> {
-    override val values = sequenceOf(successState, errorState)
+    override val values = sequenceOf(successState, errorState, loadingState)
 }
 
 private object PreviewData {
@@ -323,10 +351,17 @@ private object PreviewData {
 
     val successState = RecipeDetailsUiState(
         recipe = previewRecipe,
-        portionsCount = 3f
+        portionsCount = 3f,
+        isLoading = false
     )
 
     val errorState = RecipeDetailsUiState(
-        isError = true
+        isError = true,
+        isLoading = false
+    )
+
+    val loadingState = RecipeDetailsUiState(
+        isError = false,
+        isLoading = true
     )
 }

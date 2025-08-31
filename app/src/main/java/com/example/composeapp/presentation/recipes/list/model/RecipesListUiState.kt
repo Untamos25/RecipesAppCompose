@@ -7,5 +7,7 @@ data class RecipesListUiState(
     val categoryTitle: String = "",
     val categoryImageUrl: String = "",
     val recipes: ImmutableList<RecipeCardUiModel> = persistentListOf(),
+    val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
     val isError: Boolean = false
 )

@@ -22,5 +22,6 @@ data class RecipeEntity(
     val title: String,
     val method: List<String>,
     val imageUrl: String,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val lastSyncTime: Long = 0L
 )
