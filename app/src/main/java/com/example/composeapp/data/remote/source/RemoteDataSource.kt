@@ -4,9 +4,7 @@ import com.example.composeapp.data.remote.categories.model.CategoryDto
 import com.example.composeapp.data.remote.recipes.model.RecipeDto
 
 interface RemoteDataSource {
-    fun getCategories(): List<CategoryDto>
-    fun getCategoryById(categoryId: Int): CategoryDto?
-    fun getRecipesByCategoryId(categoryId: Int): List<RecipeDto>
-    fun getRecipeById(recipeId: Int): RecipeDto?
-    fun getRecipesByIds(recipeIds: List<Int>): List<RecipeDto>
+    suspend fun getCategories(): List<CategoryDto>
+    suspend fun getRecipesByCategoryId(categoryId: Int): List<RecipeDto>
+    suspend fun getRecipeById(recipeId: Int): RecipeDto?
 }

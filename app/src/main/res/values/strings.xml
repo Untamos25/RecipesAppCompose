@@ -12,27 +12,54 @@
     <string name="title_cooking_method">Способ приготовления</string>
     <string name="portions_count">Порций: %d</string>
 
+    <string name="unit_gram">г</string>
     <string name="unit_weight">кг</string>
+    <string name="unit_milliliter">мл</string>
+    <string name="unit_liter">л</string>
+    <string name="unit_to_taste">по вкусу</string>
+    <string name="unit_several_leaf">несколько листьев</string>
+    <string name="unit_several_pieces">несколько шт.</string>
 
     <plurals name="unit_piece">
         <item quantity="one">штука</item>
         <item quantity="few">штуки</item>
         <item quantity="many">штук</item>
-        <item quantity="other">штук</item>
-    </plurals>
-
-    <plurals name="unit_tablespoon">
-        <item quantity="one">стол. ложка</item>
-        <item quantity="few">стол. ложки</item>
-        <item quantity="many">стол. ложек</item>
-        <item quantity="other">стол. ложек</item>
+        <item quantity="other">штуки</item>
     </plurals>
 
     <plurals name="unit_clove">
         <item quantity="one">зубчик</item>
         <item quantity="few">зубчика</item>
         <item quantity="many">зубчиков</item>
-        <item quantity="other">зубчиков</item>
+        <item quantity="other">зубчика</item>
+    </plurals>
+
+    <plurals name="unit_leaf">
+        <item quantity="one">лист</item>
+        <item quantity="few">листа</item>
+        <item quantity="many">листьев</item>
+        <item quantity="other">листа</item>
+    </plurals>
+
+    <plurals name="unit_slice">
+        <item quantity="one">ломтик</item>
+        <item quantity="few">ломтика</item>
+        <item quantity="many">ломтиков</item>
+        <item quantity="other">ломтика</item>
+    </plurals>
+
+    <plurals name="unit_tablespoon">
+        <item quantity="one">стол. ложка</item>
+        <item quantity="few">стол. ложки</item>
+        <item quantity="many">стол. ложек</item>
+        <item quantity="other">стол. ложки</item>
+    </plurals>
+
+    <plurals name="unit_teaspoon">
+        <item quantity="one">чайн. ложка</item>
+        <item quantity="few">чайн. ложки</item>
+        <item quantity="many">чайн. ложек</item>
+        <item quantity="other">чайн. ложки</item>
     </plurals>
 
 </resources>

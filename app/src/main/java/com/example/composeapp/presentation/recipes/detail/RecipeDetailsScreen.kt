@@ -267,11 +267,15 @@ private fun IngredientItem(ingredient: IngredientUiModel) {
             modifier = Modifier.weight(1f)
         )
 
-        val unitText = IngredientFormatter.formatUnitOfMeasure(ingredient)
         val formattedQuantity = QuantityFormatter.format(ingredient.quantity)
+        val formattedUnitOfMeasure =
+            IngredientFormatter.formatUnitOfMeasure(
+                quantity = ingredient.quantity,
+                unitOfMeasure = ingredient.unitOfMeasure
+            )
 
         Text(
-            text = "$formattedQuantity $unitText".uppercase(),
+            text = "$formattedQuantity $formattedUnitOfMeasure".uppercase(),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSecondary,
             textAlign = TextAlign.End,
@@ -339,7 +343,7 @@ private object PreviewData {
         ingredients = persistentListOf(
             IngredientUiModel("4", "шт", "ингредиент 1"),
             IngredientUiModel("1", "кг", "ингредиент 2"),
-            IngredientUiModel("1,5", "ст. л.", "ингредиент 3")
+            IngredientUiModel("1.5", "ст. ложка", "ингредиент 3")
         ),
         method = persistentListOf(
             "1. Первый шаг приготовления",

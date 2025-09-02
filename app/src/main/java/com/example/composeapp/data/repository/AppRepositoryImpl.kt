@@ -57,19 +57,21 @@ class AppRepositoryImpl @Inject constructor(
         }
 
         val categoriesFromDb = categoryDao.getCategories().first()
-        val categoriesFromDbIds = categoriesFromDb.map {it.id}.toSet()
+        val categoriesFromDbIds = categoriesFromDb.map { it.id }.toSet()
 
         val categoriesToDelete = categoriesFromDbIds - categoriesDtoFromServerIds
         if (categoriesToDelete.isNotEmpty()) {
             categoryDao.deleteCategoriesByIds(categoriesToDelete.toList())
         }
 
-        val categoriesToUpdate = categoriesEntitiesFromServer.filter { it.id in categoriesFromDbIds }
+        val categoriesToUpdate =
+            categoriesEntitiesFromServer.filter { it.id in categoriesFromDbIds }
         if (categoriesToUpdate.isNotEmpty()) {
             categoryDao.updateCategories(categoriesToUpdate)
         }
 
-        val categoriesToInsert = categoriesEntitiesFromServer.filter { it.id !in categoriesFromDbIds }
+        val categoriesToInsert =
+            categoriesEntitiesFromServer.filter { it.id !in categoriesFromDbIds }
         if (categoriesToInsert.isNotEmpty()) {
             categoryDao.insertCategories(categoriesToInsert)
         }
@@ -94,7 +96,8 @@ class AppRepositoryImpl @Inject constructor(
 
             recipeDto.toEntity(categoryId = categoryId).copy(
                 isFavorite = isFavorite,
-                lastSyncTime = System.currentTimeMillis())
+                lastSyncTime = System.currentTimeMillis()
+            )
         }
 
         val allIngredientEntities = recipesDtoFromServer.flatMap { recipeDto ->
@@ -114,17 +117,17 @@ class AppRepositoryImpl @Inject constructor(
     override suspend fun syncRecipeDetails(recipeId: Int) = withContext(Dispatchers.IO) {
         try {
             val recipeDtoFormServer = remoteDataSource.getRecipeById(recipeId) ?: return@withContext
-
             val recipeEntityFromDb =
                 recipeDao.getRecipeWithIngredients(recipeId).first()?.recipeEntity
                     ?: return@withContext
+            val recipeEntityFromServer =
+                recipeDtoFormServer.toEntity(categoryId = recipeEntityFromDb.categoryId)
 
-            val updatedRecipeEntity = recipeEntityFromDb.copy(
-                title = recipeDtoFormServer.title,
-                method = recipeDtoFormServer.method,
-                imageUrl = recipeDtoFormServer.imageUrl,
+            val updatedRecipeEntity = recipeEntityFromServer.copy(
+                isFavorite = recipeEntityFromDb.isFavorite,
                 lastSyncTime = System.currentTimeMillis()
             )
+
             recipeDao.upsertRecipes(listOf(updatedRecipeEntity))
 
             val ingredientEntities =
