@@ -13,10 +13,31 @@
     <string name="portions_count">Servings: %d</string>
 
     <string name="unit_weight">kg</string>
+    <string name="unit_gram">g</string>
+    <string name="unit_milliliter">ml</string>
+    <string name="unit_liter">l</string>
+    <string name="unit_to_taste">to taste</string>
+    <string name="unit_several_leaf">several leafs</string>
+    <string name="unit_several_pieces">several pieces</string>
 
     <plurals name="unit_piece">
         <item quantity="one">piece</item>
         <item quantity="other">pieces</item>
+    </plurals>
+
+    <plurals name="unit_clove">
+        <item quantity="one">clove</item>
+        <item quantity="other">cloves</item>
+    </plurals>
+
+    <plurals name="unit_leaf">
+        <item quantity="one">leaf</item>
+        <item quantity="other">leaves</item>
+    </plurals>
+
+    <plurals name="unit_slice">
+        <item quantity="one">slice</item>
+        <item quantity="other">slices</item>
     </plurals>
 
     <plurals name="unit_tablespoon">
@@ -24,9 +45,9 @@
         <item quantity="other">tablespoons</item>
     </plurals>
 
-    <plurals name="unit_clove">
-        <item quantity="one">clove</item>
-        <item quantity="other">cloves</item>
+    <plurals name="unit_teaspoon">
+        <item quantity="one">teaspoon</item>
+        <item quantity="other">teaspoons</item>
     </plurals>
 
 </resources>

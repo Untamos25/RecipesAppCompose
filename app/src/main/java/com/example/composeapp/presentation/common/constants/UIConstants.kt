@@ -1,5 +1,5 @@
 package com.example.composeapp.presentation.common.constants
 
 object UIConstants {
-    const val ASSETS_URI_PREFIX = "file:///android_asset/"
+    const val BASE_IMAGE_URL = "https://recipes.androidsprint.ru/api/images/"
 }
