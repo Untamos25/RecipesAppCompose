@@ -1,19 +1,26 @@
 package com.example.composeapp.presentation.recipes.list
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -21,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.composeapp.R
+import com.example.composeapp.presentation.common.components.CollapsingAppBar
 import com.example.composeapp.presentation.common.components.RecipeItem
 import com.example.composeapp.presentation.common.components.ScreenHeader
 import com.example.composeapp.presentation.common.theme.Dimens
@@ -53,15 +61,15 @@ private fun RecipesListContent(
     onRecipeClick: (recipeId: Int) -> Unit,
     onRefresh: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    val lazyListState = rememberLazyListState()
 
-        if (!recipesListUiState.isError && !recipesListUiState.isLoading) {
-            ScreenHeader(
-                title = recipesListUiState.categoryTitle,
-                imageUrl = recipesListUiState.categoryImageUrl,
-            )
+    val showTopBar by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex > 0
         }
+    }
 
+    Box(modifier = Modifier.fillMaxSize()) {
         PullToRefreshBox(
             isRefreshing = recipesListUiState.isRefreshing,
             onRefresh = onRefresh,
@@ -90,20 +98,39 @@ private fun RecipesListContent(
 
                 else -> {
                     LazyColumn(
+                        state = lazyListState,
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(Dimens.paddingLarge),
-                        verticalArrangement = Arrangement.spacedBy(Dimens.paddingSmall)
+                        verticalArrangement = Arrangement.spacedBy(Dimens.paddingLarge)
                     ) {
-                        items(items = recipesListUiState.recipes) { recipe ->
+                        item {
+                            ScreenHeader(
+                                title = recipesListUiState.categoryTitle,
+                                imageUrl = recipesListUiState.categoryImageUrl,
+                                contentDescription = recipesListUiState.categoryTitle
+                            )
+                        }
+
+                        items(
+                            items = recipesListUiState.recipes,
+                        ) { recipe ->
                             RecipeItem(
                                 imageUri = recipe.imageUrl,
                                 title = recipe.title,
-                                onClick = { onRecipeClick(recipe.id) }
+                                onClick = { onRecipeClick(recipe.id) },
+                                modifier = Modifier.padding(horizontal = Dimens.paddingLarge)
                             )
                         }
                     }
                 }
             }
+        }
+
+        AnimatedVisibility(
+            visible = showTopBar,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            CollapsingAppBar(title = recipesListUiState.categoryTitle)
         }
     }
 }

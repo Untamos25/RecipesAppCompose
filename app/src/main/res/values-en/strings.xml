@@ -7,10 +7,16 @@
     <string name="title_favorites_read_error">Failed to load the list of favorites</string>
     <string name="title_category_not_found">Category not found</string>
     <string name="title_recipe_not_found">Recipe not found</string>
-    <string name="image_description_categories_header">A background with a variety of food</string>
     <string name="title_ingredients">Ingredients</string>
     <string name="title_cooking_method">Cooking method</string>
     <string name="portions_count">Servings: %d</string>
+
+    <string name="content_description_categories_header">A background with a variety of food</string>
+    <string name="content_description_favorites_header">Background with a variety of appetizing dishes</string>
+    <string name="content_description_recipe_image">Image of dish: %s</string>
+    <string name="content_description_favorites_icon">Favorites icon</string>
+    <string name="content_description_add_to_favorites">Add to favorites</string>
+    <string name="content_description_remove_from_favorites">Remove from favorites</string>
 
     <string name="unit_weight">kg</string>
     <string name="unit_gram">g</string>

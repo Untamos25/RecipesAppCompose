@@ -7,10 +7,16 @@
     <string name="title_favorites_read_error">Не удалось загрузить список избранного</string>
     <string name="title_category_not_found">Категория не найдена</string>
     <string name="title_recipe_not_found">Рецепт не найден</string>
-    <string name="image_description_categories_header">Фон с разнообразной едой</string>
     <string name="title_ingredients">Ингредиенты</string>
     <string name="title_cooking_method">Способ приготовления</string>
     <string name="portions_count">Порций: %d</string>
+
+    <string name="content_description_categories_header">Фон с разнообразной едой</string>
+    <string name="content_description_favorites_header">Фон с разнообразными аппетитными блюдами</string>
+    <string name="content_description_recipe_image">Изображение блюда: %s</string>
+    <string name="content_description_favorites_icon">Иконка избранного</string>
+    <string name="content_description_add_to_favorites">Добавить в избранное</string>
+    <string name="content_description_remove_from_favorites">Удалить из избранного</string>
 
     <string name="unit_gram">г</string>
     <string name="unit_weight">кг</string>

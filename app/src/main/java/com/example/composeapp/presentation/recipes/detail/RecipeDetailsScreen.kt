@@ -1,7 +1,10 @@
 package com.example.composeapp.presentation.recipes.detail
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,9 +19,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -28,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.composeapp.R
+import com.example.composeapp.presentation.common.components.CollapsingAppBar
 import com.example.composeapp.presentation.common.components.ScreenHeader
 import com.example.composeapp.presentation.common.constants.SliderConstants.MAX_PORTIONS
 import com.example.composeapp.presentation.common.constants.SliderConstants.MIN_PORTIONS
@@ -81,97 +86,148 @@ private fun RecipeDetailsContent(
     onFavoriteClick: () -> Unit,
     onRefresh: () -> Unit
 ) {
-
     val recipe = recipeDetailsUiState.recipe
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    PullToRefreshBox(
+        isRefreshing = recipeDetailsUiState.isRefreshing,
+        onRefresh = onRefresh,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        when {
+            recipeDetailsUiState.isLoading -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
 
-        Box {
-            if (recipe != null && !recipeDetailsUiState.isError && !recipeDetailsUiState.isLoading) {
-                ScreenHeader(
-                    title = recipe.title,
-                    imageUrl = recipe.imageUrl
+            recipeDetailsUiState.isError || recipe == null -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(stringResource(R.string.title_recipe_not_found))
+                }
+            }
+
+            else -> {
+                RecipeDetailsSuccessContent(
+                    recipe = recipe,
+                    portionsCount = recipeDetailsUiState.portionsCount,
+                    onSliderChange = onSliderChange,
+                    onFavoriteClick = onFavoriteClick
                 )
+            }
+        }
+    }
+}
 
-                val heartIcon =
-                    if (recipe.isFavorite) R.drawable.ic_heart else R.drawable.ic_heart_empty
-                Image(
-                    painter = painterResource(heartIcon),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .align(alignment = Alignment.TopEnd)
-                        .padding(Dimens.paddingLarge)
-                        .size(Dimens.iconSizeLarge)
-                        .clickable(onClick = onFavoriteClick)
+@Composable
+private fun RecipeDetailsSuccessContent(
+    recipe: RecipeDetailsUiModel,
+    portionsCount: Float,
+    onSliderChange: (Float) -> Unit,
+    onFavoriteClick: () -> Unit
+) {
+    val lazyListState = rememberLazyListState()
+
+    val showTopBar by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex > 0
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = lazyListState,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            item {
+                Box {
+                    ScreenHeader(
+                        title = recipe.title,
+                        imageUrl = recipe.imageUrl,
+                        contentDescription = recipe.title
+                    )
+
+                    val heartIcon =
+                        if (recipe.isFavorite) R.drawable.ic_heart else R.drawable.ic_heart_empty
+                    val heartIconContentDescription = if (recipe.isFavorite) {
+                        stringResource(R.string.content_description_remove_from_favorites)
+                    } else {
+                        stringResource(R.string.content_description_add_to_favorites)
+                    }
+
+                    Image(
+                        painter = painterResource(heartIcon),
+                        contentDescription = heartIconContentDescription,
+                        modifier = Modifier
+                            .align(alignment = Alignment.TopEnd)
+                            .padding(Dimens.paddingLarge)
+                            .size(Dimens.iconSizeLarge)
+                            .clickable(onClick = onFavoriteClick)
+                    )
+                }
+            }
+
+            item {
+                Column(Modifier.padding(horizontal = Dimens.paddingLarge)) {
+                    Text(
+                        text = stringResource(R.string.title_ingredients).uppercase(),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.displayLarge,
+                        modifier = Modifier.padding(
+                            top = Dimens.paddingLarge,
+                            bottom = Dimens.paddingExtraSmall
+                        )
+                    )
+
+                    PortionsSelector(
+                        portionsCount = portionsCount,
+                        onValueChange = onSliderChange
+                    )
+                }
+            }
+
+            item {
+                IngredientsList(
+                    ingredients = recipe.ingredients,
+                    modifier = Modifier.padding(horizontal = Dimens.paddingLarge)
+                )
+            }
+
+            item {
+                Text(
+                    text = stringResource(R.string.title_cooking_method).uppercase(),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.displayLarge,
+                    modifier = Modifier.padding(
+                        top = Dimens.paddingLarge,
+                        bottom = Dimens.paddingLarge,
+                        start = Dimens.paddingLarge,
+                        end = Dimens.paddingLarge
+                    )
+                )
+            }
+
+            item {
+                CookingMethodBlock(
+                    steps = recipe.method,
+                    modifier = Modifier.padding(horizontal = Dimens.paddingLarge)
                 )
             }
         }
 
-        PullToRefreshBox(
-            isRefreshing = recipeDetailsUiState.isRefreshing,
-            onRefresh = onRefresh,
-            modifier = Modifier.fillMaxSize()
+        AnimatedVisibility(
+            visible = showTopBar,
+            enter = fadeIn(),
+            exit = fadeOut()
         ) {
-            when {
-                recipeDetailsUiState.isLoading -> {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
-
-                recipeDetailsUiState.isError || recipe == null -> {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(stringResource(R.string.title_recipe_not_found))
-                    }
-                }
-
-                else -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = Dimens.paddingLarge)
-                            .verticalScroll(rememberScrollState()),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.title_ingredients).uppercase(),
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.displayLarge,
-                            modifier = Modifier.padding(
-                                top = Dimens.paddingLarge,
-                                bottom = Dimens.paddingExtraSmall
-                            )
-                        )
-
-                        PortionsSelector(
-                            portionsCount = recipeDetailsUiState.portionsCount,
-                            onValueChange = onSliderChange
-                        )
-
-                        IngredientsList(
-                            ingredients = recipe.ingredients
-                        )
-
-                        Text(
-                            text = stringResource(R.string.title_cooking_method).uppercase(),
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.displayLarge,
-                            modifier = Modifier.padding(vertical = Dimens.paddingLarge)
-                        )
-
-                        CookingMethodBlock(
-                            steps = recipe.method
-                        )
-                    }
-                }
-            }
+            CollapsingAppBar(title = recipe.title)
         }
     }
 }
@@ -231,9 +287,12 @@ private fun PortionsSelector(
 }
 
 @Composable
-private fun IngredientsList(ingredients: List<IngredientUiModel>) {
+private fun IngredientsList(
+    ingredients: List<IngredientUiModel>,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(top = Dimens.paddingSmall)
             .clip(RoundedCornerShape(Dimens.cornerRadiusMedium))
@@ -285,11 +344,14 @@ private fun IngredientItem(ingredient: IngredientUiModel) {
 }
 
 @Composable
-private fun CookingMethodBlock(steps: List<String>) {
+private fun CookingMethodBlock(
+    steps: List<String>,
+    modifier: Modifier = Modifier
+) {
 
     if (steps.isNotEmpty()) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(Dimens.cornerRadiusMedium))
                 .background(MaterialTheme.colorScheme.surface)

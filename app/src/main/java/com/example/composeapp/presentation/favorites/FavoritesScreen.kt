@@ -2,17 +2,24 @@ package com.example.composeapp.presentation.favorites
 
 import android.content.res.Configuration
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -21,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.composeapp.R
+import com.example.composeapp.presentation.common.components.CollapsingAppBar
 import com.example.composeapp.presentation.common.components.RecipeItem
 import com.example.composeapp.presentation.common.components.ScreenHeader
 import com.example.composeapp.presentation.common.theme.Dimens
@@ -51,56 +59,99 @@ private fun FavoritesContent(
     favoritesUiState: FavoritesUiState,
     onRecipeClick: (recipeId: Int) -> Unit
 ) {
-    Column {
-        ScreenHeader(
-            titleResId = R.string.title_favorites,
-            imageResId = R.drawable.img_header_favorites,
-        )
-
-        when {
-            favoritesUiState.isError -> {
-                CenteredMessage(textResId = R.string.title_favorites_read_error)
-            }
-            favoritesUiState.recipes.isEmpty() -> {
-                CenteredMessage(textResId = R.string.title_empty_favorites_list)
-            }
-            else -> {
-                FavoritesList(
-                    recipes = favoritesUiState.recipes,
-                    onRecipeClick = onRecipeClick
-                )
-            }
+    when {
+        favoritesUiState.recipes.isNotEmpty() && !favoritesUiState.isEmptyOrError -> {
+            FavoritesListWithHeader(
+                recipes = favoritesUiState.recipes,
+                onRecipeClick = onRecipeClick
+            )
         }
-    }
-}
-
-@Composable
-private fun FavoritesList(
-    recipes: ImmutableList<RecipeCardUiModel>,
-    onRecipeClick: (recipeId: Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(Dimens.paddingLarge),
-        verticalArrangement = Arrangement.spacedBy(Dimens.paddingSmall)
-    ) {
-        items(items = recipes) { recipe ->
-            RecipeItem(
-                imageUri = recipe.imageUrl,
-                title = recipe.title,
-                onClick = { onRecipeClick(recipe.id) }
+        else -> {
+            FavoritesEmptyOrErrorState(
+                isError = favoritesUiState.isEmptyOrError
             )
         }
     }
 }
 
 @Composable
+private fun FavoritesListWithHeader(
+    recipes: ImmutableList<RecipeCardUiModel>,
+    onRecipeClick: (recipeId: Int) -> Unit
+) {
+    val lazyListState = rememberLazyListState()
+
+    val showTopBar by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex > 0
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = lazyListState,
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(Dimens.paddingLarge)
+        ) {
+            item {
+                ScreenHeader(
+                    titleResId = R.string.title_favorites,
+                    imageResId = R.drawable.img_header_favorites,
+                    contentDescription = stringResource(id = R.string.content_description_favorites_header)
+                )
+            }
+            items(
+                items = recipes
+            ) { recipe ->
+                RecipeItem(
+                    imageUri = recipe.imageUrl,
+                    title = recipe.title,
+                    onClick = { onRecipeClick(recipe.id) },
+                    modifier = Modifier.padding(horizontal = Dimens.paddingLarge)
+                )
+            }
+        }
+
+        AnimatedVisibility(
+            visible = showTopBar,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            CollapsingAppBar(title = stringResource(id = R.string.title_favorites))
+        }
+    }
+}
+
+@Composable
+private fun FavoritesEmptyOrErrorState(
+    isError: Boolean
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        ScreenHeader(
+            titleResId = R.string.title_favorites,
+            imageResId = R.drawable.img_header_favorites,
+            contentDescription = stringResource(id = R.string.content_description_favorites_header)
+        )
+        val messageResId = if (isError) {
+            R.string.title_favorites_read_error
+        } else {
+            R.string.title_empty_favorites_list
+        }
+        CenteredMessage(
+            textResId = messageResId,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+
+@Composable
 private fun CenteredMessage(
-    @StringRes textResId: Int
+    @StringRes textResId: Int,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -112,6 +163,74 @@ private fun CenteredMessage(
         )
     }
 }
+
+//@Composable
+//private fun FavoritesContent(
+//    favoritesUiState: FavoritesUiState,
+//    onRecipeClick: (recipeId: Int) -> Unit
+//) {
+//    Column {
+//        ScreenHeader(
+//            titleResId = R.string.title_favorites,
+//            imageResId = R.drawable.img_header_favorites,
+//            contentDescription = stringResource(id = R.string.content_description_favorites_header)
+//        )
+//
+//        when {
+//            favoritesUiState.isError -> {
+//                CenteredMessage(textResId = R.string.title_favorites_read_error)
+//            }
+//            favoritesUiState.recipes.isEmpty() -> {
+//                CenteredMessage(textResId = R.string.title_empty_favorites_list)
+//            }
+//            else -> {
+//                FavoritesList(
+//                    recipes = favoritesUiState.recipes,
+//                    onRecipeClick = onRecipeClick
+//                )
+//            }
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun FavoritesList(
+//    recipes: ImmutableList<RecipeCardUiModel>,
+//    onRecipeClick: (recipeId: Int) -> Unit,
+//    modifier: Modifier = Modifier
+//) {
+//    LazyColumn(
+//        modifier = modifier.fillMaxSize(),
+//        contentPadding = PaddingValues(Dimens.paddingLarge),
+//        verticalArrangement = Arrangement.spacedBy(Dimens.paddingSmall)
+//    ) {
+//        items(items = recipes) { recipe ->
+//            RecipeItem(
+//                imageUri = recipe.imageUrl,
+//                title = recipe.title,
+//                onClick = { onRecipeClick(recipe.id) }
+//            )
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun CenteredMessage(
+//    @StringRes textResId: Int
+//) {
+//    Column(
+//        modifier = Modifier.fillMaxSize(),
+//        verticalArrangement = Arrangement.Center,
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        Text(
+//            text = stringResource(textResId),
+//            style = MaterialTheme.typography.labelMedium,
+//            color = MaterialTheme.colorScheme.onSecondary,
+//            textAlign = TextAlign.Center
+//        )
+//    }
+//}
 
 @Preview(showBackground = true)
 @Preview(showBackground = true, locale = "en", uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -149,6 +268,6 @@ private object PreviewData {
     )
 
     val errorState = FavoritesUiState(
-        isError = true
+        isEmptyOrError = true
     )
 }

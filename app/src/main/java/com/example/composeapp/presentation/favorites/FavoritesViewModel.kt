@@ -30,7 +30,7 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             getFavoriteRecipesUseCase()
                 .catch {
-                    _favoritesUiState.update { it.copy(isError = true) }
+                    _favoritesUiState.update { it.copy(isEmptyOrError = true) }
                     it.printStackTrace()
                 }
                 .collect { favoriteRecipes ->
