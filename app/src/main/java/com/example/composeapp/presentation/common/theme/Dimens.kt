@@ -14,8 +14,12 @@ object Dimens {
     // Размеры
     val iconSizeMedium = 24.dp
     val iconSizeLarge = 40.dp
-    val headerImageSize = 224.dp
     val dividerThickness = 1.dp
+
+    // Соотношения сторон изображений
+    val headerImageAspectRatio = 371f / 194f
+    val categoryImageAspectRatio = 164f / 113f
+    val recipeImageAspectRatio = 341f / 86f
 
     // Радиусы скругления
     val cornerRadiusMedium = 8.dp
@@ -24,14 +28,6 @@ object Dimens {
 
     // Параметры тени элементов
     val shadowElevation = 2.dp
-
-    // Размеры для карточки категории
-    val categoryCardWidth = 156.dp
-    val categoryCardHeight = 220.dp
-    val categoryCardImageHeight = 130.dp
-
-    // Размеры для карточки рецепта
-    val recipeCardImageHeight = 100.dp
 
     // Размеры для слайдера
     val portionsSliderThumbWidth = 8.dp

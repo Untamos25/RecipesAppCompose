@@ -4,8 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -28,12 +29,13 @@ import com.example.composeapp.presentation.common.theme.RecipesAppTheme
 fun RecipeItem(
     imageUri: String,
     title: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val cardShape = RoundedCornerShape(Dimens.cornerRadiusMedium)
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .shadow(
                 elevation = Dimens.shadowElevation,
@@ -48,12 +50,12 @@ fun RecipeItem(
                 .data(imageUri)
                 .crossfade(true)
                 .build(),
-            contentDescription = "",
+            contentDescription = stringResource(R.string.content_description_recipe_image, title),
             placeholder = painterResource(R.drawable.img_placeholder),
             error = painterResource(R.drawable.img_error),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(Dimens.recipeCardImageHeight),
+                .aspectRatio(Dimens.recipeImageAspectRatio),
             contentScale = ContentScale.Crop
         )
         Text(

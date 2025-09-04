@@ -6,5 +6,5 @@ import kotlinx.collections.immutable.persistentListOf
 
 data class FavoritesUiState(
     val recipes: ImmutableList<RecipeCardUiModel> = persistentListOf(),
-    val isError: Boolean = false
+    val isEmptyOrError: Boolean = false
 )

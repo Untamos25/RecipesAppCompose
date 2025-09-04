@@ -70,7 +70,7 @@ fun BottomNavigation(
             )
             Icon(
                 painter = painterResource(id = R.drawable.ic_heart_empty),
-                contentDescription = "",
+                contentDescription = stringResource(R.string.content_description_favorites_icon),
                 tint = Color.White,
                 modifier = Modifier
                     .size(Dimens.iconSizeMedium)

@@ -4,8 +4,8 @@ import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -31,11 +31,12 @@ fun ScreenHeader(
     @StringRes titleResId: Int? = null,
     imageUrl: String? = null,
     @DrawableRes imageResId: Int? = null,
+    contentDescription: String
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(Dimens.headerImageSize)
+            .aspectRatio(Dimens.headerImageAspectRatio)
     ) {
         val imageModel = imageUrl ?: imageResId
 
@@ -44,10 +45,10 @@ fun ScreenHeader(
                 .data(imageModel)
                 .crossfade(true)
                 .build(),
-            contentDescription = stringResource(R.string.image_description_categories_header),
+            contentDescription = contentDescription,
             placeholder = painterResource(R.drawable.img_placeholder),
             error = painterResource(R.drawable.img_error),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.Crop,
         )
 
@@ -86,7 +87,8 @@ private fun ScreenHeaderPreview() {
     RecipesAppTheme {
         ScreenHeader(
             imageResId = R.drawable.img_header_categories,
-            titleResId = R.string.title_categories
+            titleResId = R.string.title_categories,
+            contentDescription = ""
         )
     }
 }

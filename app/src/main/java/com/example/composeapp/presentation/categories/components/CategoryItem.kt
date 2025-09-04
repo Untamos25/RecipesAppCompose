@@ -4,10 +4,9 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,13 +30,13 @@ fun CategoryItem(
     imageUri: String,
     title: String,
     description: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val cardShape = RoundedCornerShape(Dimens.cornerRadiusMedium)
 
     Column(
-        modifier = Modifier
-            .size(height = Dimens.categoryCardHeight, width = Dimens.categoryCardWidth)
+        modifier = modifier
             .shadow(
                 elevation = Dimens.shadowElevation,
                 shape = cardShape
@@ -56,7 +55,7 @@ fun CategoryItem(
             error = painterResource(R.drawable.img_error),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(Dimens.categoryCardImageHeight),
+                .aspectRatio(Dimens.categoryImageAspectRatio),
             contentScale = ContentScale.Crop
         )
         Text(
@@ -70,6 +69,7 @@ fun CategoryItem(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSecondary,
             maxLines = 3,
+            minLines = 3,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(
                 start = Dimens.paddingSmall,
