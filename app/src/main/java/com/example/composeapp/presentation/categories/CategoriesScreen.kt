@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.composeapp.R
-import com.example.composeapp.presentation.categories.PreviewData.errorState
 import com.example.composeapp.presentation.categories.PreviewData.loadingState
 import com.example.composeapp.presentation.categories.PreviewData.successState
 import com.example.composeapp.presentation.categories.components.CategoryItem
@@ -64,7 +62,7 @@ fun CategoriesScreen(
 private fun CategoriesContent(
     categoriesUiState: CategoriesUiState,
     onCategoryClick: (categoryId: Int) -> Unit,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
 ) {
     PullToRefreshBox(
         isRefreshing = categoriesUiState.isRefreshing,
@@ -79,16 +77,6 @@ private fun CategoriesContent(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     CircularProgressIndicator()
-                }
-            }
-
-            categoriesUiState.isError -> {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(stringResource(R.string.title_categories_not_found))
                 }
             }
 
@@ -167,7 +155,7 @@ private fun CategoriesContentPreview(
 }
 
 private class CategoriesUiStateProvider : PreviewParameterProvider<CategoriesUiState> {
-    override val values = sequenceOf(successState, errorState, loadingState)
+    override val values = sequenceOf(successState, loadingState)
 }
 
 private object PreviewData {
@@ -186,11 +174,6 @@ private object PreviewData {
                 description = "${previewCategory.description} #$it",
             )
         }.toImmutableList(),
-        isLoading = false
-    )
-
-    val errorState = CategoriesUiState(
-        isError = true,
         isLoading = false
     )
 

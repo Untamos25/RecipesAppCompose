@@ -34,7 +34,6 @@ import com.example.composeapp.presentation.common.components.ScreenHeader
 import com.example.composeapp.presentation.common.theme.Dimens
 import com.example.composeapp.presentation.common.theme.RecipesAppTheme
 import com.example.composeapp.presentation.favorites.PreviewData.emptyState
-import com.example.composeapp.presentation.favorites.PreviewData.errorState
 import com.example.composeapp.presentation.favorites.PreviewData.filledState
 import com.example.composeapp.presentation.favorites.model.FavoritesUiState
 import com.example.composeapp.presentation.recipes.list.model.RecipeCardUiModel
@@ -59,18 +58,13 @@ private fun FavoritesContent(
     favoritesUiState: FavoritesUiState,
     onRecipeClick: (recipeId: Int) -> Unit
 ) {
-    when {
-        favoritesUiState.recipes.isNotEmpty() && !favoritesUiState.isEmptyOrError -> {
-            FavoritesListWithHeader(
-                recipes = favoritesUiState.recipes,
-                onRecipeClick = onRecipeClick
-            )
-        }
-        else -> {
-            FavoritesEmptyOrErrorState(
-                isError = favoritesUiState.isEmptyOrError
-            )
-        }
+    if (favoritesUiState.recipes.isNotEmpty()) {
+        FavoritesListWithHeader(
+            recipes = favoritesUiState.recipes,
+            onRecipeClick = onRecipeClick
+        )
+    } else {
+        FavoritesEmptyState()
     }
 }
 
@@ -123,22 +117,15 @@ private fun FavoritesListWithHeader(
 }
 
 @Composable
-private fun FavoritesEmptyOrErrorState(
-    isError: Boolean
-) {
+private fun FavoritesEmptyState() {
     Column(modifier = Modifier.fillMaxSize()) {
         ScreenHeader(
             titleResId = R.string.title_favorites,
             imageResId = R.drawable.img_header_favorites,
             contentDescription = stringResource(id = R.string.content_description_favorites_header)
         )
-        val messageResId = if (isError) {
-            R.string.title_favorites_read_error
-        } else {
-            R.string.title_empty_favorites_list
-        }
         CenteredMessage(
-            textResId = messageResId,
+            textResId = R.string.title_empty_favorites_list,
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -164,74 +151,6 @@ private fun CenteredMessage(
     }
 }
 
-//@Composable
-//private fun FavoritesContent(
-//    favoritesUiState: FavoritesUiState,
-//    onRecipeClick: (recipeId: Int) -> Unit
-//) {
-//    Column {
-//        ScreenHeader(
-//            titleResId = R.string.title_favorites,
-//            imageResId = R.drawable.img_header_favorites,
-//            contentDescription = stringResource(id = R.string.content_description_favorites_header)
-//        )
-//
-//        when {
-//            favoritesUiState.isError -> {
-//                CenteredMessage(textResId = R.string.title_favorites_read_error)
-//            }
-//            favoritesUiState.recipes.isEmpty() -> {
-//                CenteredMessage(textResId = R.string.title_empty_favorites_list)
-//            }
-//            else -> {
-//                FavoritesList(
-//                    recipes = favoritesUiState.recipes,
-//                    onRecipeClick = onRecipeClick
-//                )
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//private fun FavoritesList(
-//    recipes: ImmutableList<RecipeCardUiModel>,
-//    onRecipeClick: (recipeId: Int) -> Unit,
-//    modifier: Modifier = Modifier
-//) {
-//    LazyColumn(
-//        modifier = modifier.fillMaxSize(),
-//        contentPadding = PaddingValues(Dimens.paddingLarge),
-//        verticalArrangement = Arrangement.spacedBy(Dimens.paddingSmall)
-//    ) {
-//        items(items = recipes) { recipe ->
-//            RecipeItem(
-//                imageUri = recipe.imageUrl,
-//                title = recipe.title,
-//                onClick = { onRecipeClick(recipe.id) }
-//            )
-//        }
-//    }
-//}
-//
-//@Composable
-//private fun CenteredMessage(
-//    @StringRes textResId: Int
-//) {
-//    Column(
-//        modifier = Modifier.fillMaxSize(),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Text(
-//            text = stringResource(textResId),
-//            style = MaterialTheme.typography.labelMedium,
-//            color = MaterialTheme.colorScheme.onSecondary,
-//            textAlign = TextAlign.Center
-//        )
-//    }
-//}
-
 @Preview(showBackground = true)
 @Preview(showBackground = true, locale = "en", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -244,7 +163,7 @@ private fun FavoritesContentPreview(
 }
 
 private class FavoritesUiStateProvider : PreviewParameterProvider<FavoritesUiState> {
-    override val values = sequenceOf(filledState, emptyState, errorState)
+    override val values = sequenceOf(filledState, emptyState)
 }
 
 private object PreviewData {
@@ -265,9 +184,5 @@ private object PreviewData {
 
     val emptyState = FavoritesUiState(
         recipes = emptyList<RecipeCardUiModel>().toImmutableList()
-    )
-
-    val errorState = FavoritesUiState(
-        isEmptyOrError = true
     )
 }

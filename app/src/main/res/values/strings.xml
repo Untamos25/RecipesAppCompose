@@ -1,15 +1,23 @@
 <resources>
     <string name="app_name" translatable="false">Recipes</string>
     <string name="title_empty_favorites_list">Вы еще не добавили ни одного рецепта в избранное</string>
-    <string name="title_categories">категории</string>
-    <string name="title_favorites">избранное</string>
+    <string name="title_categories">Категории</string>
+    <string name="title_favorites">Избранное</string>
+    <string name="title_ingredients">Ингредиенты</string>
+    <string name="title_cooking_method">Способ приготовления</string>
+    <string name="portions_count">Порций: %d</string>
+
     <string name="title_categories_not_found">Не удалось загрузить категории</string>
     <string name="title_favorites_read_error">Не удалось загрузить список избранного</string>
     <string name="title_category_not_found">Категория не найдена</string>
     <string name="title_recipe_not_found">Рецепт не найден</string>
-    <string name="title_ingredients">Ингредиенты</string>
-    <string name="title_cooking_method">Способ приготовления</string>
-    <string name="portions_count">Порций: %d</string>
+    <string name="error_no_internet">Отсутствует подключение к сети</string>
+    <string name="error_database">Ошибка локальной базы данных</string>
+    <string name="error_server">Ошибка сервера. Попробуйте позже</string>
+    <string name="error_not_found">Не найдено</string>
+    <string name="error_access_denied">Ошибка доступа к данным</string>
+    <string name="error_unknown">Произошла неизвестная ошибка</string>
+    <string name="action_retry">Повторить</string>
 
     <string name="content_description_categories_header">Фон с разнообразной едой</string>
     <string name="content_description_favorites_header">Фон с разнообразными аппетитными блюдами</string>

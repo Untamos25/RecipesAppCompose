@@ -10,6 +10,5 @@ data class RecipeDetailsUiState(
     val portionsCount: Float = INITIAL_PORTIONS,
     var ingredients: ImmutableList<Ingredient> = persistentListOf(),
     val isLoading: Boolean = true,
-    val isRefreshing: Boolean = false,
-    val isError: Boolean = false
+    val isRefreshing: Boolean = false
 )
