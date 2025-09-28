@@ -1,14 +1,21 @@
 package com.example.composeapp.presentation.recipes.detail
 
+import android.database.sqlite.SQLiteException
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.composeapp.domain.common.DataResult
+import com.example.composeapp.domain.common.Error
 import com.example.composeapp.domain.recipes.usecase.CalculateIngredientsUseCase
 import com.example.composeapp.domain.recipes.usecase.GetRecipeDetailsUseCase
 import com.example.composeapp.domain.recipes.usecase.SyncRecipeDetailsUseCase
 import com.example.composeapp.domain.recipes.usecase.UpdateFavoriteStatusUseCase
+import com.example.composeapp.presentation.common.AppWideEventDelegate
 import com.example.composeapp.presentation.common.constants.CacheConstants.CACHE_LIFETIME_MS
 import com.example.composeapp.presentation.common.constants.SliderConstants.INITIAL_PORTIONS
+import com.example.composeapp.presentation.common.mapper.toUiErrorType
+import com.example.composeapp.presentation.common.model.UiErrorType
+import com.example.composeapp.presentation.common.model.UiEvent
 import com.example.composeapp.presentation.common.navigation.Destination
 import com.example.composeapp.presentation.recipes.detail.mapper.toIngredientUiModel
 import com.example.composeapp.presentation.recipes.detail.mapper.toRecipeDetailsUiModel
@@ -29,8 +36,9 @@ class RecipeDetailViewModel @Inject constructor(
     private val updateFavoriteStatusUseCase: UpdateFavoriteStatusUseCase,
     private val calculateIngredientsUseCase: CalculateIngredientsUseCase,
     private val syncRecipeDetailsUseCase: SyncRecipeDetailsUseCase,
+    private val eventDelegate: AppWideEventDelegate,
     savedStateHandle: SavedStateHandle,
-) : ViewModel() {
+) : ViewModel(), AppWideEventDelegate by eventDelegate {
 
     private val recipeId: Int =
         savedStateHandle.get<Int>(Destination.RECIPE_ID) ?: Destination.INVALID_ID
@@ -43,15 +51,18 @@ class RecipeDetailViewModel @Inject constructor(
             observeLocalData()
             syncIfRequired()
         } else {
-            _recipeDetailsUiState.update { it.copy(isLoading = false, isError = true) }
+            _recipeDetailsUiState.update { it.copy(isLoading = false) }
+            sendAppWideEvent(UiEvent.ShowSnackBarEvent(UiErrorType.Unknown))
         }
     }
 
     private fun observeLocalData() {
         viewModelScope.launch {
             getRecipeDetailsUseCase(recipeId)
-                .catch {
-                    _recipeDetailsUiState.update { it.copy(isLoading = false, isError = true) }
+                .catch { throwable ->
+                    val error = if (throwable is SQLiteException) Error.DatabaseError
+                    else Error.UnknownError
+                    sendAppWideEvent(UiEvent.ShowSnackBarEvent(error.toUiErrorType()))
                 }
                 .collect { recipeWithIngredients ->
                     if (recipeWithIngredients != null) {
@@ -66,7 +77,9 @@ class RecipeDetailViewModel @Inject constructor(
                         }
                         recalculateIngredients(recipeDetailsUiState.value.portionsCount)
                     } else {
-                        _recipeDetailsUiState.update { it.copy(isLoading = false, isError = true) }
+                        if (!_recipeDetailsUiState.value.isLoading) {
+                            sendAppWideEvent(UiEvent.ShowSnackBarEvent(UiErrorType.NotFound))
+                        }
                     }
                 }
         }
@@ -78,7 +91,7 @@ class RecipeDetailViewModel @Inject constructor(
                 val recipeDetails = getRecipeDetailsUseCase(recipeId).first()
 
                 if (recipeDetails == null || recipeDetails.recipe.method.isEmpty()) {
-                    syncData()
+                    syncData { onRefresh() }
                     return@launch
                 }
 
@@ -86,7 +99,7 @@ class RecipeDetailViewModel @Inject constructor(
                 val isCacheStale = (System.currentTimeMillis() - lastSyncTime) > CACHE_LIFETIME_MS
 
                 if (isCacheStale) {
-                    launch { syncData() }
+                    launch { syncData { onRefresh() } }
                 }
             } finally {
                 _recipeDetailsUiState.update { it.copy(isLoading = false) }
@@ -97,17 +110,23 @@ class RecipeDetailViewModel @Inject constructor(
     fun onRefresh() {
         viewModelScope.launch {
             _recipeDetailsUiState.update { it.copy(isRefreshing = true) }
-            syncData()
+            syncData { onRefresh() }
             _recipeDetailsUiState.update { it.copy(isRefreshing = false) }
         }
     }
 
-    private suspend fun syncData() {
-        try {
-            syncRecipeDetailsUseCase(recipeId)
-        } catch (e: Exception) {
-            _recipeDetailsUiState.update { it.copy(isError = true) }
-            e.printStackTrace()
+    private suspend fun syncData(onRetry: (() -> Unit)? = null) {
+        when (val result = syncRecipeDetailsUseCase(recipeId)) {
+            is DataResult.Success -> { /* no-op */ }
+
+            is DataResult.Failure -> {
+                sendAppWideEvent(
+                    UiEvent.ShowSnackBarEvent(
+                        errorType = result.error.toUiErrorType(),
+                        onRetry = onRetry
+                    )
+                )
+            }
         }
     }
 

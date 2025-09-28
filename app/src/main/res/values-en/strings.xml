@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="title_empty_favorites_list">You haven\'t added any recipes to your favorites yet</string>
-    <string name="title_categories">categories</string>
-    <string name="title_favorites">favorites</string>
+    <string name="title_categories">Categories</string>
+    <string name="title_favorites">Favorites</string>
+    <string name="title_ingredients">Ingredients</string>
+    <string name="title_cooking_method">Cooking method</string>
+    <string name="portions_count">Servings: %d</string>
+
     <string name="title_categories_not_found">Failed to load categories</string>
     <string name="title_favorites_read_error">Failed to load the list of favorites</string>
     <string name="title_category_not_found">Category not found</string>
     <string name="title_recipe_not_found">Recipe not found</string>
-    <string name="title_ingredients">Ingredients</string>
-    <string name="title_cooking_method">Cooking method</string>
-    <string name="portions_count">Servings: %d</string>
+    <string name="error_no_internet">No network connection</string>
+    <string name="error_server">Server Error. Try again later</string>
+    <string name="error_database">Local database error</string>
+    <string name="error_not_found">Not found</string>
+    <string name="error_access_denied">Data access error</string>
+    <string name="error_unknown">An unknown error occurred</string>
+    <string name="action_retry">Retry</string>
 
     <string name="content_description_categories_header">A background with a variety of food</string>
     <string name="content_description_favorites_header">Background with a variety of appetizing dishes</string>

@@ -1,12 +1,19 @@
 package com.example.composeapp.presentation.recipes.list
 
+import android.database.sqlite.SQLiteException
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composeapp.domain.categories.usecase.GetCategoryWithRecipesUseCase
+import com.example.composeapp.domain.common.DataResult
+import com.example.composeapp.domain.common.Error
 import com.example.composeapp.domain.recipes.usecase.SyncRecipesForCategoryUseCase
 import com.example.composeapp.presentation.categories.mapper.toUiModel
+import com.example.composeapp.presentation.common.AppWideEventDelegate
 import com.example.composeapp.presentation.common.constants.CacheConstants.CACHE_LIFETIME_MS
+import com.example.composeapp.presentation.common.mapper.toUiErrorType
+import com.example.composeapp.presentation.common.model.UiErrorType
+import com.example.composeapp.presentation.common.model.UiEvent
 import com.example.composeapp.presentation.common.navigation.Destination
 import com.example.composeapp.presentation.recipes.list.mapper.toRecipeCardUiModel
 import com.example.composeapp.presentation.recipes.list.model.RecipesListUiState
@@ -24,8 +31,9 @@ import javax.inject.Inject
 class RecipesListViewModel @Inject constructor(
     private val getCategoryWithRecipesUseCase: GetCategoryWithRecipesUseCase,
     private val syncRecipesForCategoryUseCase: SyncRecipesForCategoryUseCase,
+    private val eventDelegate: AppWideEventDelegate,
     savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : ViewModel(), AppWideEventDelegate by eventDelegate {
 
     private val categoryId: Int =
         savedStateHandle.get<Int>(Destination.CATEGORY_ID) ?: Destination.INVALID_ID
@@ -38,15 +46,21 @@ class RecipesListViewModel @Inject constructor(
             observeLocalData()
             syncIfRequired()
         } else {
-            _recipesListUiState.update { it.copy(isLoading = false, isError = true) }
+            _recipesListUiState.update { it.copy(isLoading = false) }
+            sendAppWideEvent(
+                UiEvent.ShowSnackBarEvent(errorType = UiErrorType.Unknown)
+            )
         }
     }
 
     private fun observeLocalData() {
         viewModelScope.launch {
             getCategoryWithRecipesUseCase(categoryId)
-                .catch {
-                    _recipesListUiState.update { it.copy(isLoading = false, isError = true) }
+                .catch { throwable ->
+                    val error =
+                        if (throwable is SQLiteException) Error.DatabaseError
+                        else Error.UnknownError
+                    sendAppWideEvent(UiEvent.ShowSnackBarEvent(error.toUiErrorType()))
                 }
                 .collect { categoryWithRecipes ->
                     if (categoryWithRecipes != null) {
@@ -58,12 +72,10 @@ class RecipesListViewModel @Inject constructor(
                         _recipesListUiState.update {
                             it.copy(
                                 categoryTitle = category.title,
-                                categoryImageUrl = category.imageUrl,
+                                categoryImageUrl = if (recipes.isNotEmpty()) category.imageUrl else null,
                                 recipes = recipes
                             )
                         }
-                    } else {
-                        _recipesListUiState.update { it.copy(isLoading = false, isError = true) }
                     }
                 }
         }
@@ -75,7 +87,7 @@ class RecipesListViewModel @Inject constructor(
                 val categoryWithRecipes = getCategoryWithRecipesUseCase(categoryId).first()
 
                 if (categoryWithRecipes == null || categoryWithRecipes.recipes.isEmpty()) {
-                    syncData()
+                    syncData({ onRefresh() })
                     return@launch
                 }
 
@@ -94,17 +106,24 @@ class RecipesListViewModel @Inject constructor(
     fun onRefresh() {
         viewModelScope.launch {
             _recipesListUiState.update { it.copy(isRefreshing = true) }
-            syncData()
+            syncData{ onRefresh() }
             _recipesListUiState.update { it.copy(isRefreshing = false) }
         }
     }
 
-    private suspend fun syncData() {
-        try {
-            syncRecipesForCategoryUseCase(categoryId)
-        } catch (e: Exception) {
-            _recipesListUiState.update { it.copy(isError = true) }
-            e.printStackTrace()
+    private suspend fun syncData(onRetry: (() -> Unit)? = null) {
+        when (val result = syncRecipesForCategoryUseCase(categoryId)) {
+            is DataResult.Success -> { /* no-op */
+            }
+
+            is DataResult.Failure -> {
+                sendAppWideEvent(
+                    UiEvent.ShowSnackBarEvent(
+                        errorType = result.error.toUiErrorType(),
+                        onRetry = onRetry
+                    )
+                )
+            }
         }
     }
 }

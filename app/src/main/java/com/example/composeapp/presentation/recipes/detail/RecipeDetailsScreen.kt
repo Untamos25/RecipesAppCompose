@@ -54,7 +54,6 @@ import com.example.composeapp.presentation.common.constants.SliderConstants.SLID
 import com.example.composeapp.presentation.common.constants.SliderConstants.SLIDER_THUMB_SCALE_DRAGGED
 import com.example.composeapp.presentation.common.theme.Dimens
 import com.example.composeapp.presentation.common.theme.RecipesAppTheme
-import com.example.composeapp.presentation.recipes.detail.PreviewData.errorState
 import com.example.composeapp.presentation.recipes.detail.PreviewData.loadingState
 import com.example.composeapp.presentation.recipes.detail.PreviewData.successState
 import com.example.composeapp.presentation.recipes.detail.formatter.IngredientFormatter
@@ -104,7 +103,7 @@ private fun RecipeDetailsContent(
                 }
             }
 
-            recipeDetailsUiState.isError || recipe == null -> {
+            recipe == null -> {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
@@ -394,7 +393,7 @@ private fun RecipeDetailsContentPreview(
 }
 
 private class RecipeDetailsUiStateProvider : PreviewParameterProvider<RecipeDetailsUiState> {
-    override val values = sequenceOf(successState, errorState, loadingState)
+    override val values = sequenceOf(successState, loadingState)
 }
 
 private object PreviewData {
@@ -421,13 +420,7 @@ private object PreviewData {
         isLoading = false
     )
 
-    val errorState = RecipeDetailsUiState(
-        isError = true,
-        isLoading = false
-    )
-
     val loadingState = RecipeDetailsUiState(
-        isError = false,
         isLoading = true
     )
 }
