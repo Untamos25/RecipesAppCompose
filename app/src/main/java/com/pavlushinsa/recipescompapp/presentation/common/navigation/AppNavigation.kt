@@ -8,7 +8,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.pavlushinsa.recipescompapp.presentation.categories.CategoriesScreen
 import com.pavlushinsa.recipescompapp.presentation.common.navigation.Destination.Companion.CATEGORY_ID
@@ -31,7 +30,7 @@ fun AppNavigation(
             navController = navController,
             startDestination = Destination.Categories.route
         ) {
-            composable(route = Destination.Favorites.route) {
+            bottomBarComposable(route = Destination.Favorites.route) {
                 FavoritesScreen(
                     viewModel = hiltViewModel(),
                     onRecipeClick = { recipeId ->
@@ -43,7 +42,7 @@ fun AppNavigation(
             }
 
 
-            composable(route = Destination.Categories.route) {
+            bottomBarComposable(route = Destination.Categories.route) {
                 CategoriesScreen(
                     viewModel = hiltViewModel(),
                     onCategoryClick = { categoryId ->
@@ -54,7 +53,7 @@ fun AppNavigation(
                 )
             }
 
-            composable(
+            animatedComposable(
                 route = Destination.Recipes.route,
                 arguments = listOf(navArgument(CATEGORY_ID) { type = NavType.IntType })
             ) {
@@ -68,7 +67,7 @@ fun AppNavigation(
                 )
             }
 
-            composable(
+            animatedComposable(
                 route = Destination.RecipeDetail.route,
                 arguments = listOf(navArgument(RECIPE_ID) { type = NavType.IntType })
             ) {

@@ -1,8 +1,15 @@
 package com.pavlushinsa.recipescompapp.presentation.recipes.detail
 
 import android.content.res.Configuration
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +48,12 @@ import com.pavlushinsa.recipescompapp.presentation.recipes.detail.model.Ingredie
 import com.pavlushinsa.recipescompapp.presentation.recipes.detail.model.RecipeDetailsUiModel
 import com.pavlushinsa.recipescompapp.presentation.recipes.detail.model.RecipeDetailsUiState
 import kotlinx.collections.immutable.persistentListOf
+
+private const val PRESSED_SCALE = 1.3f
+private const val DEFAULT_SCALE = 1f
+private const val POST_CLICK_SHRINK_SCALE = 0.9f
+private const val POST_CLICK_ANIMATION_DURATION_MS = 100
+private const val FAVORITE_ICON_CROSSFADE_DURATION_MS = 300
 
 @Composable
 fun RecipeDetailsScreen(
@@ -110,6 +125,36 @@ private fun RecipeDetailsSuccessContent(
     val lazyListState = rememberLazyListState()
     TopBarVisibilityEffect(lazyListState, onShowTopBarChanged)
 
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val scale = remember { Animatable(DEFAULT_SCALE) }
+
+    LaunchedEffect(isPressed) {
+        if (isPressed) {
+            scale.animateTo(
+                targetValue = PRESSED_SCALE,
+                animationSpec = spring(stiffness = Spring.StiffnessMedium)
+            )
+        }
+    }
+
+    LaunchedEffect(recipe.isFavorite) {
+        if (!isPressed) {
+            scale.animateTo(
+                targetValue = POST_CLICK_SHRINK_SCALE,
+                animationSpec = tween(POST_CLICK_ANIMATION_DURATION_MS)
+            )
+            scale.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            )
+        }
+    }
+
     LazyColumn(
         state = lazyListState,
         modifier = Modifier.fillMaxSize()
@@ -122,23 +167,34 @@ private fun RecipeDetailsSuccessContent(
                     contentDescription = recipe.title
                 )
 
-                val heartIcon =
-                    if (recipe.isFavorite) R.drawable.ic_heart else R.drawable.ic_heart_empty
-                val heartIconContentDescription = if (recipe.isFavorite) {
-                    stringResource(R.string.content_description_remove_from_favorites)
-                } else {
-                    stringResource(R.string.content_description_add_to_favorites)
-                }
-
-                Image(
-                    painter = painterResource(heartIcon),
-                    contentDescription = heartIconContentDescription,
+                Crossfade(
+                    targetState = recipe.isFavorite,
+                    animationSpec = tween(durationMillis = FAVORITE_ICON_CROSSFADE_DURATION_MS),
                     modifier = Modifier
                         .align(alignment = Alignment.TopEnd)
                         .padding(Dimens.paddingLarge)
-                        .size(Dimens.iconSizeLarge)
-                        .clickable(onClick = onFavoriteClick)
-                )
+                        .scale(scale.value)
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null,
+                            onClick = onFavoriteClick
+                        ),
+                    label = "FavoriteIconCrossfade"
+                ) { isFavorite ->
+                    val heartIcon =
+                        if (isFavorite) R.drawable.ic_heart else R.drawable.ic_heart_empty
+                    val contentDescriptionRes = if (isFavorite) {
+                        R.string.content_description_remove_from_favorites
+                    } else {
+                        R.string.content_description_add_to_favorites
+                    }
+
+                    Image(
+                        painter = painterResource(heartIcon),
+                        contentDescription = stringResource(contentDescriptionRes),
+                        modifier = Modifier.size(Dimens.iconSizeLarge)
+                    )
+                }
             }
         }
 
