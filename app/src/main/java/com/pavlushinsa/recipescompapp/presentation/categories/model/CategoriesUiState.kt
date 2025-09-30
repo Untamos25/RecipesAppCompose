@@ -1,0 +1,10 @@
+package com.pavlushinsa.recipescompapp.presentation.categories.model
+
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+
+data class CategoriesUiState(
+    val categories: ImmutableList<CategoryUiModel> = persistentListOf(),
+    val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false
+)

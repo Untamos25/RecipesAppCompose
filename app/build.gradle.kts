@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.composeapp"
+    namespace = "com.pavlushinsa.recipescompapp"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.composeapp"
+        applicationId = "com.pavlushinsa.recipescompapp"
         minSdk = 28
         targetSdk = 35
         versionCode = 1
