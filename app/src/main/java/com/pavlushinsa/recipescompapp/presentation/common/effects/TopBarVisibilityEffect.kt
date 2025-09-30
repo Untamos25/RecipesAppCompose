@@ -1,0 +1,41 @@
+package com.pavlushinsa.recipescompapp.presentation.common.effects
+
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+
+@Composable
+fun TopBarVisibilityEffect(
+    lazyListState: LazyListState,
+    onShowTopBarChanged: (Boolean) -> Unit
+) {
+    val showTopBar by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex > 0
+        }
+    }
+
+    LaunchedEffect(showTopBar) {
+        onShowTopBarChanged(showTopBar)
+    }
+}
+
+@Composable
+fun TopBarVisibilityEffect(
+    lazyGridState: LazyGridState,
+    onShowTopBarChanged: (Boolean) -> Unit
+) {
+    val showTopBar by remember {
+        derivedStateOf {
+            lazyGridState.firstVisibleItemIndex > 0
+        }
+    }
+
+    LaunchedEffect(showTopBar) {
+        onShowTopBarChanged(showTopBar)
+    }
+}
