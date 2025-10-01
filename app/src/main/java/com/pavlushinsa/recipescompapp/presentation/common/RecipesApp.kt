@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import com.pavlushinsa.recipescompapp.R
 import com.pavlushinsa.recipescompapp.presentation.common.components.BottomNavigation
@@ -71,19 +72,34 @@ fun RecipesApp() {
             }
         }
 
-
         RecipesAppContent(
             snackbarHostState = snackbarHostState,
-            onCategoriesClick = { navController.navigate(Destination.Categories.route) },
-            onFavoriteClick = { navController.navigate(Destination.Favorites.route) },
+            onCategoriesClick = {
+                navController.navigate(Destination.Categories.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
+            onFavoriteClick = {
+                navController.navigate(Destination.Favorites.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
             topBarTitle = topBarTitle,
             showTopBar = showTopBar,
             content = { modifier ->
                 AppNavigation(
                     navController = navController,
                     modifier = modifier,
-                    onTitleChanged = { title -> topBarTitle = title },
-                    onShowTopBarChanged = { show -> showTopBar = show }
+                    onTitleChange = { title -> topBarTitle = title },
+                    onShowTopBarChange = { show -> showTopBar = show }
                 )
             }
         )

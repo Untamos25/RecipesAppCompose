@@ -39,20 +39,20 @@ import kotlinx.collections.immutable.toImmutableList
 fun FavoritesScreen(
     viewModel: FavoritesViewModel,
     onRecipeClick: (recipeId: Int) -> Unit,
-    onTitleChanged: (String) -> Unit,
-    onShowTopBarChanged: (Boolean) -> Unit
+    onTitleChange: (String) -> Unit,
+    onShowTopBarChange: (Boolean) -> Unit
 ) {
     val favoritesUiState by viewModel.favoritesUiState.collectAsState()
     val screenTitle = stringResource(id = R.string.title_favorites)
 
     LaunchedEffect(Unit) {
-        onTitleChanged(screenTitle)
+        onTitleChange(screenTitle)
     }
 
     FavoritesContent(
         favoritesUiState = favoritesUiState,
         onRecipeClick = onRecipeClick,
-        onShowTopBarChanged = onShowTopBarChanged
+        onShowTopBarChange = onShowTopBarChange
     )
 }
 
@@ -60,17 +60,17 @@ fun FavoritesScreen(
 private fun FavoritesContent(
     favoritesUiState: FavoritesUiState,
     onRecipeClick: (recipeId: Int) -> Unit,
-    onShowTopBarChanged: (Boolean) -> Unit
+    onShowTopBarChange: (Boolean) -> Unit
 ) {
     if (favoritesUiState.recipes.isNotEmpty()) {
         FavoritesSuccessContent(
             recipes = favoritesUiState.recipes,
             onRecipeClick = onRecipeClick,
-            onShowTopBarChanged = onShowTopBarChanged
+            onShowTopBarChange = onShowTopBarChange
         )
     } else {
         LaunchedEffect(Unit) {
-            onShowTopBarChanged(false)
+            onShowTopBarChange(false)
         }
         FavoritesEmptyState()
     }
@@ -80,10 +80,10 @@ private fun FavoritesContent(
 private fun FavoritesSuccessContent(
     recipes: ImmutableList<RecipeCardUiModel>,
     onRecipeClick: (recipeId: Int) -> Unit,
-    onShowTopBarChanged: (Boolean) -> Unit
+    onShowTopBarChange: (Boolean) -> Unit
 ) {
     val lazyListState = rememberLazyListState()
-    TopBarVisibilityEffect(lazyListState, onShowTopBarChanged)
+    TopBarVisibilityEffect(lazyListState, onShowTopBarChange)
 
     LazyColumn(
         state = lazyListState,
@@ -155,7 +155,7 @@ private fun FavoritesContentPreview(
         FavoritesContent(
             favoritesUiState = state,
             onRecipeClick = {},
-            onShowTopBarChanged = {})
+            onShowTopBarChange = {})
     }
 }
 

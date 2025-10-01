@@ -27,16 +27,17 @@ import com.pavlushinsa.recipescompapp.presentation.common.theme.RecipesAppTheme
 
 @Composable
 fun ScreenHeader(
+    contentDescription: String,
     title: String? = null,
-    @StringRes titleResId: Int? = null,
     imageUrl: String? = null,
-    @DrawableRes imageResId: Int? = null,
-    contentDescription: String
+    @StringRes titleResId: Int? = null,
+    @DrawableRes imageResId: Int? = null
+
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(Dimens.headerImageAspectRatio)
+            .aspectRatio(Dimens.HEADER_IMAGE_ASPECT_RATIO)
     ) {
         val imageModel = imageUrl ?: imageResId
 

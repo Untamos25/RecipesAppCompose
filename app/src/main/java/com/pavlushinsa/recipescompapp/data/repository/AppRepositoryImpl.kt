@@ -1,5 +1,6 @@
 package com.pavlushinsa.recipescompapp.data.repository
 
+import android.database.SQLException
 import android.util.Log
 import com.pavlushinsa.recipescompapp.data.local.categories.dao.CategoryDao
 import com.pavlushinsa.recipescompapp.data.local.categories.mapper.toDomain
@@ -32,13 +33,6 @@ class AppRepositoryImpl @Inject constructor(
 
     companion object {
         private const val LOG_TAG = "AppRepositoryImpl"
-    }
-
-    private object HttpCode {
-        const val UNAUTHORIZED = 401
-        const val NOT_FOUND = 404
-        const val SERVER_ERROR_START = 500
-        const val SERVER_ERROR_END = 599
     }
 
     override fun getCategories(): Flow<List<Category>> {
@@ -202,7 +196,7 @@ class AppRepositoryImpl @Inject constructor(
             is DataResult.Failure -> apiResult
         }
     }
-
+@Suppress("TooGenericExceptionCaught")
     private suspend fun <T> safeApiCall(apiCall: suspend () -> T): DataResult<T, Error> {
         return try {
             DataResult.Success(apiCall())
@@ -227,9 +221,16 @@ class AppRepositoryImpl @Inject constructor(
     private suspend fun <T> safeDbCall(dbCall: suspend () -> T): DataResult<T, Error> {
         return try {
             DataResult.Success(dbCall())
-        } catch (e: Exception) {
+        } catch (e: SQLException) {
             Log.e(LOG_TAG, "Database exception: ${e.message}", e)
             DataResult.Failure(Error.DatabaseError)
         }
     }
+}
+
+private object HttpCode {
+    const val UNAUTHORIZED = 401
+    const val NOT_FOUND = 404
+    const val SERVER_ERROR_START = 500
+    const val SERVER_ERROR_END = 599
 }

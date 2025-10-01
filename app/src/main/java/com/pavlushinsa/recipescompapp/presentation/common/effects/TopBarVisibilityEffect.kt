@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 @Composable
 fun TopBarVisibilityEffect(
     lazyListState: LazyListState,
-    onShowTopBarChanged: (Boolean) -> Unit
+    onShowTopBarChange: (Boolean) -> Unit
 ) {
     val showTopBar by remember {
         derivedStateOf {
@@ -20,14 +20,14 @@ fun TopBarVisibilityEffect(
     }
 
     LaunchedEffect(showTopBar) {
-        onShowTopBarChanged(showTopBar)
+        onShowTopBarChange(showTopBar)
     }
 }
 
 @Composable
 fun TopBarVisibilityEffect(
     lazyGridState: LazyGridState,
-    onShowTopBarChanged: (Boolean) -> Unit
+    onShowTopBarChange: (Boolean) -> Unit
 ) {
     val showTopBar by remember {
         derivedStateOf {
@@ -36,6 +36,6 @@ fun TopBarVisibilityEffect(
     }
 
     LaunchedEffect(showTopBar) {
-        onShowTopBarChanged(showTopBar)
+        onShowTopBarChange(showTopBar)
     }
 }

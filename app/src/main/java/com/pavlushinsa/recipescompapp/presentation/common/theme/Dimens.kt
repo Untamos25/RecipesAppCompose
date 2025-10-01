@@ -17,9 +17,9 @@ object Dimens {
     val dividerThickness = 1.dp
 
     // Соотношения сторон изображений
-    val headerImageAspectRatio = 371f / 194f
-    val categoryImageAspectRatio = 164f / 113f
-    val recipeImageAspectRatio = 341f / 86f
+    const val HEADER_IMAGE_ASPECT_RATIO = 371f / 194f
+    const val CATEGORY_IMAGE_ASPECT_RATIO = 164f / 113f
+    const val RECIPE_IMAGE_ASPECT_RATIO = 341f / 86f
 
     // Радиусы скругления
     val cornerRadiusMedium = 8.dp

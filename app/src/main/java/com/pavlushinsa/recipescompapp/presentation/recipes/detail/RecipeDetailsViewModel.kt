@@ -12,13 +12,13 @@ import com.pavlushinsa.recipescompapp.domain.recipes.usecase.SyncRecipeDetailsUs
 import com.pavlushinsa.recipescompapp.domain.recipes.usecase.UpdateFavoriteStatusUseCase
 import com.pavlushinsa.recipescompapp.presentation.common.AppWideEventDelegate
 import com.pavlushinsa.recipescompapp.presentation.common.constants.CacheConstants.CACHE_LIFETIME_MS
-import com.pavlushinsa.recipescompapp.presentation.common.constants.SliderConstants.INITIAL_PORTIONS
 import com.pavlushinsa.recipescompapp.presentation.common.mapper.toUiErrorType
 import com.pavlushinsa.recipescompapp.presentation.common.model.UiErrorType
 import com.pavlushinsa.recipescompapp.presentation.common.model.UiEvent
 import com.pavlushinsa.recipescompapp.presentation.common.navigation.Destination
 import com.pavlushinsa.recipescompapp.presentation.recipes.detail.mapper.toIngredientUiModel
 import com.pavlushinsa.recipescompapp.presentation.recipes.detail.mapper.toRecipeDetailsUiModel
+import com.pavlushinsa.recipescompapp.presentation.recipes.detail.model.INITIAL_PORTIONS
 import com.pavlushinsa.recipescompapp.presentation.recipes.detail.model.RecipeDetailsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RecipeDetailViewModel @Inject constructor(
+class RecipeDetailsViewModel @Inject constructor(
     private val getRecipeDetailsUseCase: GetRecipeDetailsUseCase,
     private val updateFavoriteStatusUseCase: UpdateFavoriteStatusUseCase,
     private val calculateIngredientsUseCase: CalculateIngredientsUseCase,

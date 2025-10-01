@@ -20,8 +20,8 @@ import com.pavlushinsa.recipescompapp.presentation.recipes.list.RecipesListScree
 fun AppNavigation(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    onTitleChanged: (String) -> Unit,
-    onShowTopBarChanged: (Boolean) -> Unit
+    onTitleChange: (String) -> Unit,
+    onShowTopBarChange: (Boolean) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -36,8 +36,8 @@ fun AppNavigation(
                     onRecipeClick = { recipeId ->
                         navController.navigate(Destination.RecipeDetail.createRoute(recipeId))
                     },
-                    onTitleChanged = onTitleChanged,
-                    onShowTopBarChanged = onShowTopBarChanged
+                    onTitleChange = onTitleChange,
+                    onShowTopBarChange = onShowTopBarChange
                 )
             }
 
@@ -48,8 +48,8 @@ fun AppNavigation(
                     onCategoryClick = { categoryId ->
                         navController.navigate(Destination.Recipes.createRoute(categoryId))
                     },
-                    onTitleChanged = onTitleChanged,
-                    onShowTopBarChanged = onShowTopBarChanged
+                    onTitleChange = onTitleChange,
+                    onShowTopBarChange = onShowTopBarChange
                 )
             }
 
@@ -62,8 +62,8 @@ fun AppNavigation(
                     onRecipeClick = { recipeId ->
                         navController.navigate(Destination.RecipeDetail.createRoute(recipeId))
                     },
-                    onTitleChanged = onTitleChanged,
-                    onShowTopBarChanged = onShowTopBarChanged
+                    onTitleChange = onTitleChange,
+                    onShowTopBarChange = onShowTopBarChange
                 )
             }
 
@@ -73,8 +73,8 @@ fun AppNavigation(
             ) {
                 RecipeDetailsScreen(
                     viewModel = hiltViewModel(),
-                    onTitleChanged = onTitleChanged,
-                    onShowTopBarChanged = onShowTopBarChanged
+                    onTitleChange = onTitleChange,
+                    onShowTopBarChange = onShowTopBarChange
                 )
             }
         }

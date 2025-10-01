@@ -55,7 +55,7 @@ fun CategoryItem(
             error = painterResource(R.drawable.img_error),
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(Dimens.categoryImageAspectRatio),
+                .aspectRatio(Dimens.CATEGORY_IMAGE_ASPECT_RATIO),
             contentScale = ContentScale.Crop
         )
         Text(

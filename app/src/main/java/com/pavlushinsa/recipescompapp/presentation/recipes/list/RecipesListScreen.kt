@@ -31,14 +31,14 @@ import kotlinx.collections.immutable.toImmutableList
 fun RecipesListScreen(
     viewModel: RecipesListViewModel,
     onRecipeClick: (recipeId: Int) -> Unit,
-    onTitleChanged: (String) -> Unit,
-    onShowTopBarChanged: (Boolean) -> Unit
+    onTitleChange: (String) -> Unit,
+    onShowTopBarChange: (Boolean) -> Unit
 ) {
     val recipesListUiState by viewModel.recipesListUiState.collectAsState()
 
     LaunchedEffect(recipesListUiState.categoryTitle) {
         if (recipesListUiState.categoryTitle.isNotBlank()) {
-            onTitleChanged(recipesListUiState.categoryTitle)
+            onTitleChange(recipesListUiState.categoryTitle)
         }
     }
 
@@ -46,7 +46,7 @@ fun RecipesListScreen(
         recipesListUiState = recipesListUiState,
         onRecipeClick = onRecipeClick,
         onRefresh = viewModel::onRefresh,
-        onShowTopBarChanged = onShowTopBarChanged
+        onShowTopBarChange = onShowTopBarChange
     )
 }
 
@@ -55,7 +55,7 @@ private fun RecipesListContent(
     recipesListUiState: RecipesListUiState,
     onRecipeClick: (recipeId: Int) -> Unit,
     onRefresh: () -> Unit,
-    onShowTopBarChanged: (Boolean) -> Unit
+    onShowTopBarChange: (Boolean) -> Unit
 ) {
     ScreenContentWrapper(
         isLoading = recipesListUiState.isLoading,
@@ -65,7 +65,7 @@ private fun RecipesListContent(
         RecipesListSuccessContent(
             recipesListUiState = recipesListUiState,
             onRecipeClick = onRecipeClick,
-            onShowTopBarChanged = onShowTopBarChanged
+            onShowTopBarChange = onShowTopBarChange
         )
     }
 }
@@ -74,10 +74,10 @@ private fun RecipesListContent(
 private fun RecipesListSuccessContent(
     recipesListUiState: RecipesListUiState,
     onRecipeClick: (recipeId: Int) -> Unit,
-    onShowTopBarChanged: (Boolean) -> Unit
+    onShowTopBarChange: (Boolean) -> Unit
 ) {
     val lazyListState = rememberLazyListState()
-    TopBarVisibilityEffect(lazyListState, onShowTopBarChanged)
+    TopBarVisibilityEffect(lazyListState, onShowTopBarChange)
 
     LazyColumn(
         state = lazyListState,
@@ -117,7 +117,7 @@ private fun RecipesContentPreview(
             recipesListUiState = state,
             onRecipeClick = {},
             onRefresh = {},
-            onShowTopBarChanged = {}
+            onShowTopBarChange = {}
         )
     }
 }
