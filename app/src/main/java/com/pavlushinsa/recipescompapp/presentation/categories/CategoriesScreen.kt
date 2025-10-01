@@ -37,21 +37,21 @@ private const val COLUMN_COUNT = 2
 fun CategoriesScreen(
     viewModel: CategoriesViewModel,
     onCategoryClick: (categoryId: Int) -> Unit,
-    onTitleChanged: (String) -> Unit,
-    onShowTopBarChanged: (Boolean) -> Unit
+    onTitleChange: (String) -> Unit,
+    onShowTopBarChange: (Boolean) -> Unit
 ) {
     val categoriesUiState by viewModel.categoriesUiState.collectAsState()
     val screenTitle = stringResource(id = R.string.title_categories)
 
     LaunchedEffect(Unit) {
-        onTitleChanged(screenTitle)
+        onTitleChange(screenTitle)
     }
 
     CategoriesContent(
         categoriesUiState = categoriesUiState,
         onCategoryClick = onCategoryClick,
         onRefresh = viewModel::onRefresh,
-        onShowTopBarChanged = onShowTopBarChanged
+        onShowTopBarChange = onShowTopBarChange
     )
 }
 
@@ -60,7 +60,7 @@ private fun CategoriesContent(
     categoriesUiState: CategoriesUiState,
     onCategoryClick: (categoryId: Int) -> Unit,
     onRefresh: () -> Unit,
-    onShowTopBarChanged: (Boolean) -> Unit
+    onShowTopBarChange: (Boolean) -> Unit
 ) {
     ScreenContentWrapper(
         isLoading = categoriesUiState.isLoading,
@@ -70,7 +70,7 @@ private fun CategoriesContent(
         CategoriesSuccessContent(
             categories = categoriesUiState.categories,
             onCategoryClick = onCategoryClick,
-            onShowTopBarChanged = onShowTopBarChanged
+            onShowTopBarChange = onShowTopBarChange
         )
     }
 }
@@ -79,10 +79,10 @@ private fun CategoriesContent(
 private fun CategoriesSuccessContent(
     categories: ImmutableList<CategoryUiModel>,
     onCategoryClick: (categoryId: Int) -> Unit,
-    onShowTopBarChanged: (Boolean) -> Unit
+    onShowTopBarChange: (Boolean) -> Unit
 ) {
     val lazyGridState = rememberLazyGridState()
-    TopBarVisibilityEffect(lazyGridState, onShowTopBarChanged)
+    TopBarVisibilityEffect(lazyGridState, onShowTopBarChange)
 
     LazyVerticalGrid(
         state = lazyGridState,
@@ -121,7 +121,7 @@ private fun CategoriesContentPreview(
             onCategoryClick = {},
             categoriesUiState = state,
             onRefresh = {},
-            onShowTopBarChanged = {}
+            onShowTopBarChange = {}
         )
     }
 }

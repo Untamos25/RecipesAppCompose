@@ -55,7 +55,7 @@ fun RecipeItem(
             error = painterResource(R.drawable.img_error),
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(Dimens.recipeImageAspectRatio),
+                .aspectRatio(Dimens.RECIPE_IMAGE_ASPECT_RATIO),
             contentScale = ContentScale.Crop
         )
         Text(

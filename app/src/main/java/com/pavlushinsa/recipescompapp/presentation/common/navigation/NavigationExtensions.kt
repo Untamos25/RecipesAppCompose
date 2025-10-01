@@ -12,9 +12,8 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-
-private const val ANIMATION_DURATION = 300
-private const val ANIMATION_OFFSET = 1000
+import com.pavlushinsa.recipescompapp.presentation.common.navigation.NavAnimations.ANIMATION_DURATION
+import com.pavlushinsa.recipescompapp.presentation.common.navigation.NavAnimations.ANIMATION_OFFSET
 
 fun NavGraphBuilder.animatedComposable(
     route: String,
@@ -26,10 +25,30 @@ fun NavGraphBuilder.animatedComposable(
         route = route,
         arguments = arguments,
         deepLinks = deepLinks,
-        enterTransition = { slideInHorizontally(initialOffsetX = { ANIMATION_OFFSET }, animationSpec = tween(ANIMATION_DURATION)) + fadeIn() },
-        exitTransition = { slideOutHorizontally(targetOffsetX = { -ANIMATION_OFFSET }, animationSpec = tween(ANIMATION_DURATION)) + fadeOut() },
-        popEnterTransition = { slideInHorizontally(initialOffsetX = { -ANIMATION_OFFSET }, animationSpec = tween(ANIMATION_DURATION)) + fadeIn() },
-        popExitTransition = { slideOutHorizontally(targetOffsetX = { ANIMATION_OFFSET }, animationSpec = tween(ANIMATION_DURATION)) + fadeOut() },
+        enterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { ANIMATION_OFFSET },
+                animationSpec = tween(ANIMATION_DURATION)
+            ) + fadeIn()
+        },
+        exitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { -ANIMATION_OFFSET },
+                animationSpec = tween(ANIMATION_DURATION)
+            ) + fadeOut()
+        },
+        popEnterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { -ANIMATION_OFFSET },
+                animationSpec = tween(ANIMATION_DURATION)
+            ) + fadeIn()
+        },
+        popExitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { ANIMATION_OFFSET },
+                animationSpec = tween(ANIMATION_DURATION)
+            ) + fadeOut()
+        },
         content = content
     )
 }
@@ -46,20 +65,47 @@ fun NavGraphBuilder.bottomBarComposable(
         deepLinks = deepLinks,
         enterTransition = {
             if (targetState.destination.route == Destination.Categories.route) {
-                slideInHorizontally(initialOffsetX = { -ANIMATION_OFFSET }, animationSpec = tween(ANIMATION_DURATION))
+                slideInHorizontally(
+                    initialOffsetX = { -ANIMATION_OFFSET },
+                    animationSpec = tween(ANIMATION_DURATION)
+                )
             } else {
-                slideInHorizontally(initialOffsetX = { ANIMATION_OFFSET }, animationSpec = tween(ANIMATION_DURATION))
+                slideInHorizontally(
+                    initialOffsetX = { ANIMATION_OFFSET },
+                    animationSpec = tween(ANIMATION_DURATION)
+                )
             } + fadeIn()
         },
         exitTransition = {
             if (targetState.destination.route == Destination.Categories.route) {
-                slideOutHorizontally(targetOffsetX = { ANIMATION_OFFSET }, animationSpec = tween(ANIMATION_DURATION))
+                slideOutHorizontally(
+                    targetOffsetX = { ANIMATION_OFFSET },
+                    animationSpec = tween(ANIMATION_DURATION)
+                )
             } else {
-                slideOutHorizontally(targetOffsetX = { -ANIMATION_OFFSET }, animationSpec = tween(ANIMATION_DURATION))
+                slideOutHorizontally(
+                    targetOffsetX = { -ANIMATION_OFFSET },
+                    animationSpec = tween(ANIMATION_DURATION)
+                )
             } + fadeOut()
         },
-        popEnterTransition = { slideInHorizontally(initialOffsetX = { -ANIMATION_OFFSET }, animationSpec = tween(ANIMATION_DURATION)) + fadeIn() },
-        popExitTransition = { slideOutHorizontally(targetOffsetX = { ANIMATION_OFFSET }, animationSpec = tween(ANIMATION_DURATION)) + fadeOut() },
+        popEnterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { -ANIMATION_OFFSET },
+                animationSpec = tween(ANIMATION_DURATION)
+            ) + fadeIn()
+        },
+        popExitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { ANIMATION_OFFSET },
+                animationSpec = tween(ANIMATION_DURATION)
+            ) + fadeOut()
+        },
         content = content
     )
+}
+
+private object NavAnimations {
+    const val ANIMATION_DURATION = 300
+    const val ANIMATION_OFFSET = 1000
 }

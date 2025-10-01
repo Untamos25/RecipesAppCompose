@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,12 +31,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.pavlushinsa.recipescompapp.R
+import com.pavlushinsa.recipescompapp.presentation.common.components.ButtonAnimations.ANIMATION_DURATION_MS
+import com.pavlushinsa.recipescompapp.presentation.common.components.ButtonAnimations.DEFAULT_BUTTON_SCALE
+import com.pavlushinsa.recipescompapp.presentation.common.components.ButtonAnimations.PRESSED_BUTTON_SCALE
 import com.pavlushinsa.recipescompapp.presentation.common.theme.Dimens
 import com.pavlushinsa.recipescompapp.presentation.common.theme.RecipesAppTheme
-
-private const val PRESSED_BUTTON_SCALE = 0.95f
-private const val DEFAULT_BUTTON_SCALE = 1f
-private const val ANIMATION_DURATION_MS = 100
 
 @Composable
 fun BottomNavigation(
@@ -50,22 +51,10 @@ fun BottomNavigation(
                 bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             )
     ) {
-        val categoriesInteractionSource = remember { MutableInteractionSource() }
-        val isCategoriesPressed by categoriesInteractionSource.collectIsPressedAsState()
-        val categoriesScale by animateFloatAsState(
-            targetValue = if (isCategoriesPressed) PRESSED_BUTTON_SCALE else DEFAULT_BUTTON_SCALE,
-            animationSpec = tween(durationMillis = ANIMATION_DURATION_MS),
-            label = "categoriesScaleAnimation"
-        )
-
-        Button(
+        AnimatedNavButton(
             onClick = onCategoriesClick,
-            shape = RoundedCornerShape(Dimens.cornerRadiusMedium),
             colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary),
-            interactionSource = categoriesInteractionSource,
-            modifier = Modifier
-                .weight(1f)
-                .scale(categoriesScale)
+            modifier = Modifier.weight(1f)
         ) {
             Text(
                 text = stringResource(R.string.title_categories).uppercase(),
@@ -76,22 +65,10 @@ fun BottomNavigation(
 
         Spacer(modifier = Modifier.size(Dimens.paddingTiny))
 
-        val favoritesInteractionSource = remember { MutableInteractionSource() }
-        val isFavoritesPressed by favoritesInteractionSource.collectIsPressedAsState()
-        val favoritesScale by animateFloatAsState(
-            targetValue = if (isFavoritesPressed) PRESSED_BUTTON_SCALE else DEFAULT_BUTTON_SCALE,
-            animationSpec = tween(durationMillis = ANIMATION_DURATION_MS),
-            label = "favoritesScaleAnimation"
-        )
-
-        Button(
+        AnimatedNavButton(
             onClick = onFavoriteClick,
-            shape = RoundedCornerShape(Dimens.cornerRadiusMedium),
             colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
-            interactionSource = favoritesInteractionSource,
-            modifier = Modifier
-                .weight(1f)
-                .scale(favoritesScale)
+            modifier = Modifier.weight(1f)
         ) {
             Text(
                 text = stringResource(R.string.title_favorites).uppercase(),
@@ -103,13 +80,37 @@ fun BottomNavigation(
                 painter = painterResource(id = R.drawable.ic_heart_empty),
                 contentDescription = stringResource(R.string.content_description_favorites_icon),
                 tint = Color.White,
-                modifier = Modifier
-                    .size(Dimens.iconSizeMedium)
+                modifier = Modifier.size(Dimens.iconSizeMedium)
             )
         }
     }
 }
 
+@Composable
+private fun RowScope.AnimatedNavButton(
+    colors: ButtonColors,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    content: @Composable RowScope.() -> Unit,
+
+    ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) PRESSED_BUTTON_SCALE else DEFAULT_BUTTON_SCALE,
+        animationSpec = tween(durationMillis = ANIMATION_DURATION_MS),
+        label = "scaleAnimation"
+    )
+
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(Dimens.cornerRadiusMedium),
+        colors = colors,
+        interactionSource = interactionSource,
+        modifier = modifier.scale(scale),
+        content = content
+    )
+}
 
 @Preview(showBackground = true)
 @Preview(showBackground = true, locale = "en", uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -121,4 +122,10 @@ private fun BottomNavigationPreview() {
             onFavoriteClick = {}
         )
     }
+}
+
+private object ButtonAnimations {
+    const val PRESSED_BUTTON_SCALE = 0.95f
+    const val DEFAULT_BUTTON_SCALE = 1f
+    const val ANIMATION_DURATION_MS = 100
 }
