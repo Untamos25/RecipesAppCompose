@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pavlushinsa.recipescompapp.domain.common.DataResult
 import com.pavlushinsa.recipescompapp.domain.common.Error
+import com.pavlushinsa.recipescompapp.domain.recipes.model.Ingredient
 import com.pavlushinsa.recipescompapp.domain.recipes.usecase.CalculateIngredientsUseCase
 import com.pavlushinsa.recipescompapp.domain.recipes.usecase.GetRecipeDetailsUseCase
 import com.pavlushinsa.recipescompapp.domain.recipes.usecase.SyncRecipeDetailsUseCase
@@ -46,6 +47,8 @@ class RecipeDetailsViewModel @Inject constructor(
     private val _recipeDetailsUiState = MutableStateFlow(RecipeDetailsUiState())
     val recipeDetailsUiState = _recipeDetailsUiState.asStateFlow()
 
+    private var originalIngredients: List<Ingredient> = emptyList()
+
     init {
         if (recipeId != Destination.INVALID_ID) {
             observeLocalData()
@@ -67,15 +70,13 @@ class RecipeDetailsViewModel @Inject constructor(
                 .collect { recipeWithIngredients ->
                     if (recipeWithIngredients != null) {
                         val recipe = recipeWithIngredients.toRecipeDetailsUiModel()
-                        val ingredients = recipeWithIngredients.ingredients.toPersistentList()
+                        originalIngredients = recipeWithIngredients.ingredients
 
                         _recipeDetailsUiState.update {
                             it.copy(
                                 recipe = recipe,
-                                ingredients = ingredients
                             )
                         }
-                        recalculateIngredients(recipeDetailsUiState.value.portionsCount)
                     } else {
                         if (!_recipeDetailsUiState.value.isLoading) {
                             sendAppWideEvent(UiEvent.ShowSnackBarEvent(UiErrorType.NotFound))
@@ -136,16 +137,15 @@ class RecipeDetailsViewModel @Inject constructor(
     }
 
     private fun recalculateIngredients(newPortions: Float) {
-        val recipe = _recipeDetailsUiState.value.recipe
-        val ingredients = _recipeDetailsUiState.value.ingredients
-        if (ingredients.isEmpty() || recipe == null) return
+        val currentRecipe = _recipeDetailsUiState.value.recipe
+        if (originalIngredients.isEmpty() || currentRecipe == null) return
 
         val updatedIngredients = calculateIngredientsUseCase(
-            originalIngredients = ingredients,
+            originalIngredients = originalIngredients,
             initialPortions = INITIAL_PORTIONS,
             newPortions = newPortions
         ).map { it.toIngredientUiModel() }.toPersistentList()
-        val updatedRecipe = recipe.copy(ingredients = updatedIngredients)
+        val updatedRecipe = currentRecipe.copy(ingredients = updatedIngredients)
 
         _recipeDetailsUiState.update { it.copy(recipe = updatedRecipe) }
     }

@@ -76,18 +76,14 @@ fun RecipesApp() {
             snackbarHostState = snackbarHostState,
             onCategoriesClick = {
                 navController.navigate(Destination.Categories.route) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
-                    }
+                    popUpTo(navController.graph.findStartDestination().id) {saveState = true}
                     launchSingleTop = true
                     restoreState = true
                 }
             },
             onFavoriteClick = {
                 navController.navigate(Destination.Favorites.route) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
-                    }
+                    popUpTo(navController.graph.findStartDestination().id) {saveState = true}
                     launchSingleTop = true
                     restoreState = true
                 }
