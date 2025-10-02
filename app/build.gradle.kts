@@ -49,6 +49,10 @@ detekt {
     config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)

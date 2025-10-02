@@ -17,7 +17,7 @@ import com.pavlushinsa.recipescompapp.data.local.recipes.dao.RecipeDao
         IngredientEntity::class
     ],
     version = 1,
-    exportSchema = false
+    exportSchema = true
 )
 @TypeConverters(MethodConverter::class)
 
