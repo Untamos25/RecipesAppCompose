@@ -1,6 +1,7 @@
 package com.pavlushinsa.recipescompapp.presentation.recipes.detail
 
 import android.database.sqlite.SQLiteException
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,7 +27,7 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,6 +41,10 @@ class RecipeDetailsViewModel @Inject constructor(
     private val eventDelegate: AppWideEventDelegate,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(), AppWideEventDelegate by eventDelegate {
+
+    companion object {
+        private const val LOG_TAG = "RecipeDetailsViewModel"
+    }
 
     private val recipeId: Int =
         savedStateHandle.get<Int>(Destination.RECIPE_ID) ?: Destination.INVALID_ID
@@ -89,7 +94,12 @@ class RecipeDetailsViewModel @Inject constructor(
     private fun syncIfRequired() {
         viewModelScope.launch {
             try {
-                val recipeDetails = getRecipeDetailsUseCase(recipeId).first()
+                val recipeDetails = try {
+                    getRecipeDetailsUseCase(recipeId).firstOrNull()
+                } catch (e: SQLiteException) {
+                    Log.e(LOG_TAG, "DB error on syncIfRequired check for recipeId: $recipeId", e)
+                    return@launch
+                }
 
                 if (recipeDetails == null || recipeDetails.recipe.method.isEmpty()) {
                     syncData { onRefresh() }
@@ -118,7 +128,8 @@ class RecipeDetailsViewModel @Inject constructor(
 
     private suspend fun syncData(onRetry: (() -> Unit)? = null) {
         when (val result = syncRecipeDetailsUseCase(recipeId)) {
-            is DataResult.Success -> { /* no-op */ }
+            is DataResult.Success -> { /* no-op */
+            }
 
             is DataResult.Failure -> {
                 sendAppWideEvent(
@@ -132,6 +143,10 @@ class RecipeDetailsViewModel @Inject constructor(
     }
 
     fun onPortionsChange(newPortions: Float) {
+        if (originalIngredients.isEmpty() || _recipeDetailsUiState.value.recipe == null) {
+            return
+        }
+
         _recipeDetailsUiState.update { it.copy(portionsCount = newPortions) }
         recalculateIngredients(newPortions)
     }
@@ -150,10 +165,19 @@ class RecipeDetailsViewModel @Inject constructor(
         _recipeDetailsUiState.update { it.copy(recipe = updatedRecipe) }
     }
 
+    @Suppress("TooGenericExceptionCaught")
     fun onFavoriteClick() {
         val recipe = _recipeDetailsUiState.value.recipe ?: return
         viewModelScope.launch {
-            updateFavoriteStatusUseCase(recipe.id, !recipe.isFavorite)
+            try {
+                updateFavoriteStatusUseCase(recipe.id, !recipe.isFavorite)
+            } catch (e: SQLiteException) {
+                Log.e(LOG_TAG, "Database error updating favorite status for recipe ${recipe.id}", e)
+                sendAppWideEvent(UiEvent.ShowSnackBarEvent(Error.DatabaseError.toUiErrorType()))
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Unknown error updating favorite status for recipe ${recipe.id}", e)
+                sendAppWideEvent(UiEvent.ShowSnackBarEvent(Error.UnknownError.toUiErrorType()))
+            }
         }
     }
 }

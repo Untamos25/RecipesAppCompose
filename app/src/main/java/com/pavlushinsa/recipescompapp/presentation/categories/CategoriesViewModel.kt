@@ -1,6 +1,7 @@
 package com.pavlushinsa.recipescompapp.presentation.categories
 
 import android.database.sqlite.SQLiteException
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pavlushinsa.recipescompapp.domain.categories.usecase.GetCategoriesUseCase
@@ -18,7 +19,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,9 +31,12 @@ class CategoriesViewModel @Inject constructor(
     private val eventDelegate: AppWideEventDelegate
 ) : ViewModel(), AppWideEventDelegate by eventDelegate {
 
+    companion object {
+        private const val LOG_TAG = "CategoriesViewModel"
+    }
+
     private val _categoriesUiState = MutableStateFlow(CategoriesUiState())
     val categoriesUiState = _categoriesUiState.asStateFlow()
-
 
     init {
         observeLocalCategories()
@@ -60,9 +64,13 @@ class CategoriesViewModel @Inject constructor(
     private fun syncIfRequired() {
         viewModelScope.launch {
             try {
-                val categories = getCategoriesUseCase().first()
-
-                if (categories.isEmpty()) {
+                val categories = try {
+                    getCategoriesUseCase().firstOrNull()
+                } catch (e: SQLiteException) {
+                    Log.e(LOG_TAG, "DB error on syncIfRequired check", e)
+                    return@launch
+                }
+                if (categories.isNullOrEmpty()) {
                     syncData { onRefresh() }
                     return@launch
                 }
@@ -87,7 +95,7 @@ class CategoriesViewModel @Inject constructor(
         }
     }
 
-    private suspend fun syncData(onRetry: () -> Unit) {
+    private suspend fun syncData(onRetry: (() -> Unit)? = null) {
         when (val result = syncCategoriesUseCase()) {
             is DataResult.Success -> { /* no-op */
             }
