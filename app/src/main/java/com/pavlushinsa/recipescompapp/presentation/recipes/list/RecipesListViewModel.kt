@@ -1,6 +1,7 @@
 package com.pavlushinsa.recipescompapp.presentation.recipes.list
 
 import android.database.sqlite.SQLiteException
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,7 +23,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,6 +35,10 @@ class RecipesListViewModel @Inject constructor(
     private val eventDelegate: AppWideEventDelegate,
     savedStateHandle: SavedStateHandle
 ) : ViewModel(), AppWideEventDelegate by eventDelegate {
+
+    companion object {
+        private const val LOG_TAG = "RecipesListViewModel"
+    }
 
     private val categoryId: Int =
         savedStateHandle.get<Int>(Destination.CATEGORY_ID) ?: Destination.INVALID_ID
@@ -84,10 +89,15 @@ class RecipesListViewModel @Inject constructor(
     private fun syncIfRequired() {
         viewModelScope.launch {
             try {
-                val categoryWithRecipes = getCategoryWithRecipesUseCase(categoryId).first()
+                val categoryWithRecipes = try {
+                    getCategoryWithRecipesUseCase(categoryId).firstOrNull()
+                } catch (e: SQLiteException) {
+                    Log.e(LOG_TAG, "DB error on syncIfRequired check for categoryId: $categoryId", e)
+                    return@launch
+                }
 
                 if (categoryWithRecipes == null || categoryWithRecipes.recipes.isEmpty()) {
-                    syncData({ onRefresh() })
+                    syncData { onRefresh() }
                     return@launch
                 }
 
@@ -106,7 +116,7 @@ class RecipesListViewModel @Inject constructor(
     fun onRefresh() {
         viewModelScope.launch {
             _recipesListUiState.update { it.copy(isRefreshing = true) }
-            syncData{ onRefresh() }
+            syncData { onRefresh() }
             _recipesListUiState.update { it.copy(isRefreshing = false) }
         }
     }

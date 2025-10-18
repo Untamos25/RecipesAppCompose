@@ -47,6 +47,7 @@ android {
 
 detekt {
     config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    baseline = file("$rootDir/detekt-baseline.xml")
 }
 
 ksp {
@@ -78,6 +79,9 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
