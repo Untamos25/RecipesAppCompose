@@ -238,7 +238,7 @@ class CategoriesViewModelTest : BaseViewModelTest() {
     fun `GIVEN user requests refresh WHEN sync is successful THEN should show refreshing state`() =
         runTest {
             // ARRANGE
-            coEvery { getCategoriesUseCase() } returns flowOf(emptyList()) // Initial state
+            coEvery { getCategoriesUseCase() } returns flowOf(emptyList())
             coEvery { syncCategoriesUseCase() } returns DataResult.Success(Unit)
 
             viewModel =

@@ -58,8 +58,8 @@ class RecipeDetailsViewModelTest : BaseViewModelTest() {
     private val testRecipeId = 1
 
     @Before
-    override fun setUp() { // <-- Добавляем override
-        super.setUp() // <-- ВАЖНО: вызываем setUp
+    override fun setUp() {
+        super.setUp()
         MockKAnnotations.init(this)
         savedStateHandle = SavedStateHandle(mapOf(Destination.RECIPE_ID to testRecipeId))
     }

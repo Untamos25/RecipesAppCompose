@@ -47,8 +47,8 @@ class RecipesListViewModelTest : BaseViewModelTest() {
     private val testCategoryId = 1
 
     @Before
-    override fun setUp() { // <-- Добавляем override
-        super.setUp() // <-- ВАЖНО: вызываем setUp
+    override fun setUp() {
+        super.setUp()
         MockKAnnotations.init(this)
         savedStateHandle = SavedStateHandle(mapOf(Destination.CATEGORY_ID to testCategoryId))
     }
